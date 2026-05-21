@@ -1,0 +1,140 @@
+.password-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+.password-wrapper {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+}
+.password-wrapper input {
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;
+  outline: none;
+}
+.toggle-password {
+  padding: 10px;
+  background-color: #eee;
+  border: 1px solid #ccc;
+  border-left: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  font-size: 20px;
+  outline: none;
+  transition: background-color 0.2s;
+}
+.toggle-password:hover {
+  background-color: #ddd;
+}
+.login-page {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.login-form div {
+  margin-bottom: 15px;
+}
+
+.login-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.login-form input.error {
+  border-color: red;
+}
+
+.error-message {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+button[type="submit"] {
+  padding: 12px 24px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+button[type="submit"]:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+}
+
+button[type="submit"]:active {
+  background-color: #3e8e41;
+  transform: translateY(0);
+}
+.success-message {
+  padding: 10px 20px;
+  margin-top: 15px;
+  border: 1px solid #4CAF50;
+  background-color: #dff0d8;
+  color: #3c763d;
+  border-radius: 4px;
+  font-weight: 600;
+}
+@media (max-width: 480px) {
+  .login-page {
+    max-width: 90%;
+    margin: 20px auto;
+    padding: 15px;
+  }
+
+  .password-group {
+    margin-bottom: 12px;
+  }
+
+  .login-form div {
+    margin-bottom: 12px;
+  }
+
+  .login-form label {
+    font-size: 14px;
+  }
+
+  .login-form input {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .error-message {
+    font-size: 11px;
+  }
+
+  .success-message {
+    font-size: 13px;
+  }
+  .toggle-password {
+    padding: 8px;
+    font-size: 18px;
+  }
+}

@@ -1,0 +1,93 @@
+.register-page {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+.register-form div {
+  margin-bottom: 15px;
+}
+.register-form label {
+  display: block;
+  margin-bottom: 5px;
+}
+.register-form input {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+button {
+  padding: 10px 20px;
+  cursor: pointer;
+}
+.error {
+  border-color: red;
+}
+.error-message {
+  color: red;
+  font-size: 12px;
+}
+button[type="submit"] {
+  padding: 12px 24px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+button[type="submit"]:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+}
+button[type="submit"]:active {
+  background-color: #3e8e41;
+  transform: translateY(0);
+}
+.success-message {
+  padding: 10px 20px;
+  margin-top: 15px;
+  border: 1px solid #4CAF50;
+  background-color: #dff0d8;
+  color: #3c763d;
+  border-radius: 4px;
+  font-weight: 600;
+}
+@media (max-width: 480px) {
+  .register-page {
+    max-width: 90%;
+    margin: 20px auto;
+    padding: 15px;
+  }
+
+  .register-form div {
+    margin-bottom: 12px;
+  }
+
+  .register-form label {
+    font-size: 14px;
+  }
+
+  .register-form input {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  button {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .error-message {
+    font-size: 11px;
+  }
+
+  .success-message {
+    font-size: 13px;
+  }
+}
