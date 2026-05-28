@@ -59,7 +59,7 @@ const RegisterPage = () => {
   return (
     <div className="register-page">
       <h2>Регистрация</h2>
-      <form onSubmit={handleSubmit} className="register-form" noValidate>
+      <form action="http://localhost/RegisterPage.php" method='post' className="register-form" noValidate>
         <div>
           <label>Имя:</label>
           <input

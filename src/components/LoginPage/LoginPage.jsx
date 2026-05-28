@@ -52,7 +52,7 @@ const LoginPage = () => {
   return (
     <div className="login-page">
       <h2>Войти</h2>
-      <form onSubmit={handleSubmit} className="login-form" noValidate>
+      <form action="http://localhost/LoginPage.php" method='post' className="login-form" noValidate>
         <div>
           <label>Email:</label>
           <input
