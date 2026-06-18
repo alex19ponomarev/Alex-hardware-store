@@ -1,0 +1,32 @@
+CREATE TABLE products (
+    id INT PRIMARY KEY,
+    name VARCHAR(255),
+    price DECIMAL(10,2),
+    oldPrice DECIMAL(10,2),
+    discount INT,
+    category VARCHAR(50),
+    rating DECIMAL(3,1),
+    reviews INT,
+    image VARCHAR(255)
+);
+
+
+INSERT INTO products (id, name, price, oldPrice, discount, category, rating, reviews, image) VALUES
+(1, '6.1" Смартфон Apple iPhone 15 128 ГБ черный', 56999, 60999, 14, 'Смартфоны', 4.8, 124, '2258685cc32bbd96de406852bd9b2d94916029658cd6fa120a9f97a4bc0af297.jpg.webp'),
+(2, '16" Ноутбук HUAWEI MateBook D 16 2024 MCLF-X серый', 54999, NULL, NULL, 'Ноутбуки', 4.9, 89, 'f8c1d514292bd887b7279a1fa5f26692c8c70e6dd1ca86b6a8a7b3a4f4b6b0bd.jpg.webp'),
+(3, 'Беспроводные наушники Logitech G435 черный 2021', 4999, 6499, 23, 'Аудиотехника', 4.7, 201, '73dd06c0a2d4c9ff74cfaafaedec60012cae0a437e72ed35351e0fa8fa203289.jpg.webp'),
+(4, '11.5" Планшет HUAWEI MatePad 11.5 (2025) Wi-Fi 256 ГБ фиолетовый + клавиатура + чехол', 30999, 24999, 20, 'Планшеты', 4.6, 76, '4c50e9737ae8188a63bd98b1bfeb429bef560e3599fea1c03b45e8d06bb400cb.jpg.webp'),
+(5, '43" (108 см) Телевизор Xiaomi TV A 43 2026 черный', 25999, 32999, 13, 'Телевизоры', 4.5, 92, '6d15582c93b7c52895ebbec99067b3d5c1bf6f1c3492f3eb03c03b7c0d912498.jpg.webp'),
+(6, 'Смарт-часы Apple Watch SE 3 40 mm', 26099, 28999, 2, 'Умные часы', 4.4, 156, 'f669b852c62ac46ba3ee888d63a43d8a5d896a1f38e2cca75c142f3d87eaf909.jpg.webp'),
+(7, '6.67" Смартфон Xiaomi Redmi Note 14 256 ГБ черный', 56999, 60999, 14, 'Смартфоны', 4.8, 124, 'd242d02b93b30a304475ef2569e05a4b67123d1c80fec310082000dbb8f7995c.jpg.webp'),
+(8, '6.7" Смартфон Samsung Galaxy A56 256 ГБ черный', 32999, 60999, 14, 'Смартфоны', 4.8, 124, '831a385f76f265293448bc5b858ab3d74053e6cf4ada47e0649b959d7bcb5567.jpg.webp'),
+(9, '13.6" Ноутбук Apple MacBook Air M4 серебристый', 94999, 105499, 14, 'Ноутбуки', 4.8, 124, 'ad01cc5e1b26d2babbb87e8bbaacce13612222ffb9b39b939605a9023e9c8f03.png.webp'),
+(10, '17.3" Ноутбук ASUS TUF Gaming FX707VJ-HX015 серый', 88999, 90999, 14, 'Ноутбуки', 4.8, 124, '98ebc786ba1821e79ded93dfb338087cabbbe840a96d389b8151c615f27420d7.jpg.webp'),
+(11, '24" (61 см) Телевизор Aceline 24HEN2 черный', 6199, 10000, 14, 'Телевизоры', 4.8, 124, 'ab7c0179d9f377fc23be740ae96168658c20a36166f7877887620fccdf3287a7.jpg.webp'),
+(12, '50" (127 см) Телевизор Xiaomi TV A Pro 50 2026 черный', 32999, 40999, 14, 'Телевизоры', 4.8, 124, '463aa9acfebc92bf7dd1c5809e07036bde6049290d3f889d2f99e8656809e472.jpg.webp'),
+(13, 'Наушники TWS Apple AirPods Pro 3 белый 2025', 23499, 30499, 23, 'Аудиотехника', 4.7, 201, '313c94e5085fa534b5afa8c9af2c45d36bf847fa53e577853ecd7ee1d25b38eb.jpg.webp'),
+(14, 'Беспроводные/проводные наушники Marshall Major V черный 2024', 8199, 9499, 23, 'Аудиотехника', 4.7, 201, '7dde57929a7052a80ee0cb23bea558c3e2fefe222cb4e3c3b38015d9e9585f6f.jpg.webp'),
+(15, '11" Планшет Apple iPad (11th Gen) Wi-Fi 128 ГБ розовый', 30999, 35999, 20, 'Планшеты', 4.6, 76, '0f34320499fd55046f4822350223b874d505d500e0d89a1e085930872efb4382.jpg.webp'),
+(16, '11" Планшет Xiaomi REDMI Pad 2 Wi-Fi 256 ГБ серый', 18599, 24999, 20, 'Планшеты', 4.6, 76, 'adf8895f945cd0f3a6b18228277567ef9b981ca302d637c2af58c09392e5ec8b.jpg.webp'),
+(17, 'Фитнес-браслет Xiaomi Smart Band 10', 3699, 4000, 2, 'Умные часы', 4.4, 156, '233b16db498c1ceb275ed36d54b4a96fa6d508afb8a0cef8a392a4408f27b3aa.jpg.webp'),
+(18, 'Смарт-часы HUAWEI WATCH GT 6 Pro 46 mm', 21199, 28999, 2, 'Умные часы', 4.4, 156, 'b5c2c5363e1aa5ddf78130ca0a97ba36de62a1dff4ef5012e0944c5c0ccf52df.jpg.webp');
