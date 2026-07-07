@@ -1,0 +1,21 @@
+CREATE TABLE `sales_products` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(255) NOT NULL,
+  `price` DECIMAL(10, 2) NOT NULL,
+  `oldPrice` DECIMAL(10, 2),
+  `discount` INT, -- в процентах
+  `category` VARCHAR(100),
+  `rating` DECIMAL(3, 2),
+  `reviews` INT,
+  `image` VARCHAR(255),
+  `saleEnds` DATE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+
+INSERT INTO `sales_products` (`name`, `price`, `oldPrice`, `discount`, `category`, `rating`, `reviews`, `image`, `saleEnds`)
+VALUES
+('6.7" Смартфон Samsung Galaxy A56 256 ГБ черный', 32999, 60999, 14, 'Смартфоны', 4.8, 124, '831a385f76f265293448bc5b858ab3d74053e6cf4ada47e0649b959d7bcb5567.jpg.webp', '2026-11-25'),
+('16" Ноутбук HUAWEI MateBook D 16 2024 MCLF-X серый', 54999, NULL, NULL, 'Ноутбуки', 4.9, 89, 'f8c1d514292bd887b7279a1fa5f26692c8c70e6dd1ca86b6a8a7b3a4f4b6b0bd.jpg.webp', '2026-12-25'),
+('Беспроводные/проводные наушники Marshall Major V черный 2024', 8199, 9499, 23, 'Аудиотехника', 4.7, 201, '7dde57929a7052a80ee0cb23bea558c3e2fefe222cb4e3c3b38015d9e9585f6f.jpg.webp', '2026-11-30'),
+('11.5" Планшет HUAWEI MatePad 11.5 (2025) Wi-Fi 256 ГБ фиолетовый + клавиатура + чехол', 30999, 24999, 20, 'Планшеты', 4.6, 76, '4c50e9737ae8188a63bd98b1bfeb429bef560e3599fea1c03b45e8d06bb400cb.jpg.webp', '2026-12-15');

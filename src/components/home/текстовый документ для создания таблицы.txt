@@ -1,0 +1,12 @@
+CREATE TABLE productsHOME (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    image_path VARCHAR(255) NOT NULL
+);
+
+
+INSERT INTO products (name, price, image_path) VALUES 
+('Смартфон', 29999, '2258685cc32bbd96de406852bd9b2d94916029658cd6fa120a9f97a4bc0af297.jpg.webp'),
+('Ноутбук', 59999, 'f8c1d514292bd887b7279a1fa5f26692c8c70e6dd1ca86b6a8a7b3a4f4b6b0bd.jpg.webp'),
+('Наушники PRO', 4999, '73dd06c0a2d4c9ff74cfaafaedec60012cae0a437e72ed35351e0fa8fa203289.jpg.webp');

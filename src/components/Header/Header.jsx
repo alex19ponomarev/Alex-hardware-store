@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './Header.css';
-const Header = ({ cart = [] }) => {
+
+const Header = ({ cart = [], user = null, onLogout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
-  const navigate = useNavigate();
   const menuRef = useRef(null);
+
+  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
+  const closeMenu = () => setIsMenuOpen(false);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -16,80 +18,72 @@ const Header = ({ cart = [] }) => {
     if (isMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isMenuOpen]);
+
+  const totalItems = cart.reduce((total, item) => total + (item.quantity || 0), 0);
 
   const handleContactsClick = (e) => {
     e.preventDefault();
+    closeMenu();
     const contactsSection = document.getElementById('contacts-section');
     if (contactsSection) {
       contactsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-    setIsMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+    onLogout();
   };
 
   return (
-    <header className="header" role="banner">
+    <header className="header">
       <div className="header__container">
         <div className="header__logo">
           <h1>AlexTechStore</h1>
           <span className="logo-tagline">Техника для жизни</span>
         </div>
-        <button
-          className={`header__mobile-menu ${isMenuOpen ? 'open' : ''}`}
-          onClick={toggleMenu}
-          aria-label="Открыть меню"
-          aria-expanded={isMenuOpen}
-          aria-controls="navigation"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
+
+        <button className={`header__mobile-menu ${isMenuOpen ? 'open' : ''}`} onClick={toggleMenu}>
+          <span></span><span></span><span></span>
         </button>
-        <nav
-          className={`header__nav ${isMenuOpen ? 'active' : ''}`}
-          id="navigation"
-          ref={menuRef}
-        >
+
+        <nav className={`header__nav ${isMenuOpen ? 'active' : ''}`} id="navigation" ref={menuRef}>
           <ul className="header__menu">
-            <li><Link to="/">Главная</Link></li>
-            <li><Link to="/catalog">Каталог</Link></li>
-            <li><Link to="/sales">Акции</Link></li>
+            <li><Link to="/" onClick={closeMenu}>Главная</Link></li>
+            <li><Link to="/catalog" onClick={closeMenu}>Каталог</Link></li>
+            <li><Link to="/sales" onClick={closeMenu}>Акции</Link></li>
             <li>
-              <a href="#contacts-section" onClick={handleContactsClick}>
-                Контакты
-              </a>
+              <a href="#contacts-section" onClick={handleContactsClick}>Контакты</a>
             </li>
           </ul>
         </nav>
+
         <div className="header__actions">
           <div className="header__cart">
-            <Link to="/cart" className="header__cart-btn">
+            <Link to="/cart" className="header__cart-btn" onClick={closeMenu}>
               🛒 Корзина ({totalItems})
             </Link>
-            {totalItems > 0 && (
-              <span className="cart-badge">{totalItems}</span>
-            )}
+            {totalItems > 0 && <span className="cart-badge">{totalItems}</span>}
           </div>
 
-          <button
-            className="header__auth-btn"
-            onClick={() => navigate('/login')}
-          >
-            Войти
-          </button>
-          
-          <button
-            className="header__register-btn"
-            onClick={() => navigate('/register')}
-          >
-            Регистрация
-          </button>
+          <div className="header__auth">
+            {user ? (
+              <>
+                <span className="header__profile-info"> {user.email}</span>
+                <button onClick={handleLogout} className="logout-btn">Выйти</button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="header__auth-btn" onClick={closeMenu}>Войти</Link>
+                <Link to="/register" className="header__register-btn" onClick={closeMenu}>Регистрация</Link>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </header>
   );
 };
+
 export default Header;

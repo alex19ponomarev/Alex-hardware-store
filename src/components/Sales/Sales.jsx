@@ -1,69 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Sales.css';
-import productImage1 from '../../assets/images/831a385f76f265293448bc5b858ab3d74053e6cf4ada47e0649b959d7bcb5567.jpg.webp';
-import productImage2 from '../../assets/images/f8c1d514292bd887b7279a1fa5f26692c8c70e6dd1ca86b6a8a7b3a4f4b6b0bd.jpg.webp';
-import productImage3 from '../../assets/images/7dde57929a7052a80ee0cb23bea558c3e2fefe222cb4e3c3b38015d9e9585f6f.jpg.webp';
-import productImage4 from '../../assets/images/4c50e9737ae8188a63bd98b1bfeb429bef560e3599fea1c03b45e8d06bb400cb.jpg.webp';
+import vkIcon from '../../assets/icons/VK.com-logo.svg.png';
+import telegramIcon from '../../assets/icons/Telegram_logo.svg.png';
+import messengerMaxIcon from '../../assets/icons/max.webp';
 const Sales = ({ cart, setCart }) => {
   const [salesProducts, setSalesProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [notification, setNotification] = useState('');
   const timeoutRef = useRef(null);
+  const apiUrl = 'http://localhost/Sales.php';
+
   useEffect(() => {
-    const mockSales = [
-          {
-            id: 1,
-            name: '6.7" Смартфон Samsung Galaxy A56 256 ГБ черный',
-            price: 32999 ,
-            oldPrice: 60999,
-            discount: 14,
-            category: 'Смартфоны',
-            rating: 4.8,
-            reviews: 124,
-            image: productImage1,
-        saleEnds: '2026-11-25'
-          },
-      {
-       id: 2,
-              name: '16" Ноутбук HUAWEI MateBook D 16 2024 MCLF-X серый',
-              price: 54999,
-              oldPrice: null,
-              discount: null,
-              category: 'Ноутбуки',
-              rating: 4.9,
-              reviews: 89,
-              image: productImage2,
-              saleEnds: '2026-12-25'
-      },
-      {
-    id: 3,
-            name: 'Беспроводные/проводные наушники Marshall Major V черный 2024',
-            price: 8199,
-            oldPrice: 9499,
-            discount: 23,
-            category: 'Аудиотехника',
-            rating: 4.7,
-            reviews: 201,
-            image: productImage3,
-        saleEnds: '2026-11-30'
-      },
-      {
-        id: 4,
-                name: '11.5" Планшет HUAWEI MatePad 11.5 (2025) Wi-Fi 256 ГБ фиолетовый + клавиатура + чехол',
-                price: 30999,
-                oldPrice: 24999,
-                discount: 20,
-                category: 'Планшеты',
-                rating: 4.6,
-                reviews: 76,
-                image: productImage4,
-        saleEnds: '2026-12-15'
-      }
-    ];
-    setSalesProducts(mockSales);
-    setFilteredProducts(mockSales);
+    fetch(apiUrl)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setSalesProducts(data.data);
+          setFilteredProducts(data.data);
+        } else {
+          console.error('Ошибка загрузки данных:', data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Ошибка сети:', error);
+      });
   }, []);
+
   useEffect(() => {
     if (searchTerm.trim() === '') {
       setFilteredProducts(salesProducts);
@@ -135,15 +98,19 @@ const Sales = ({ cart, setCart }) => {
         <div className="sales-grid">
           {filteredProducts.map(product => (
             <div key={product.id} className="sale-card">
-             <div className="sale-card__image">
-  <img src={product.image} alt={product.name} className="sale-card__img" />
-  <span className="discount-badge">-{product.discount}%</span>
-</div>
+              <div className="sale-card__image">
+                <img src={product.imageUrl} alt={product.name} className="sale-card__img" />
+                {product.discount && (
+                  <span className="discount-badge">-{product.discount}%</span>
+                )}
+              </div>
               <div className="sale-card__info">
                 <h3 className="sale-card__title">{product.name}</h3>
                 <div className="sale-card__category">Категория: {product.category}</div>
                 <div className="product-price">
-                  <span className="price-old">{product.oldPrice} ₽</span>
+                  {product.oldPrice && (
+                    <span className="price-old">{product.oldPrice} ₽</span>
+                  )}
                   <span className="price-current">{product.price} ₽</span>
                 </div>
                 <div className="sale-card__timer">
@@ -175,6 +142,72 @@ const Sales = ({ cart, setCart }) => {
           {notification}
         </div>
       )}
+
+
+      <footer className="footer">
+        <div className="footer__container">
+          <div className="footer__section">
+            <h3 className="footer__title">О магазине</h3>
+            <p>TechStore — ваш надёжный поставщик электроники и бытовой техники с 2026 года.</p>
+          </div>
+
+          <div className="footer__section">
+            <h3 className="footer__title">Категории</h3>
+            <ul className="footer__links">
+              <li><a href="/catalog?category=Смартфоны">Смартфоны</a></li>
+              <li><a href="/catalog?category=Ноутбуки">Ноутбуки</a></li>
+              <li><a href="/catalog?category=Телевизоры">Телевизоры</a></li>
+              <li><a href="/catalog?category=Аудиотехника">Аудиотехника</a></li>
+            </ul>
+          </div>
+
+          <div className="footer__section">
+            <h3 className="footer__title">Мы в соцсетях</h3>
+            <div className="footer__social">
+              <a
+                href="https://telegram.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-icon"
+                aria-label="Telegram"
+              >
+                <img src={telegramIcon} alt="Telegram" className="social-icon-img" />
+              </a>
+              <a
+                href="https://vk.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-icon"
+                aria-label="VKontakte"
+              >
+                <img src={vkIcon} alt="ВКонтакте" className="social-icon-img" />
+              </a>
+              <a
+                href="https://max.ru"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-icon"
+                aria-label="Messenger Max"
+              >
+                <img src={messengerMaxIcon} alt="Messenger Max" className="social-icon-img" />
+              </a>
+            </div>
+          </div>
+
+          <div className="footer__section" id="contacts-section">
+            <h3 className="footer__title">Контакты</h3>
+            <div className="footer__contacts">
+              <p>📞 +88005553535</p>
+              <p>✉️ Alex@techstore.ru</p>
+              <p>📍 г. Ростов-на-Дону, ул. Проспект Ленина</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="footer__bottom">
+          <p>&copy; 2026 TechStore. Все права защищены.</p>
+        </div>
+      </footer>
     </div>
   );
 };

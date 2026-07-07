@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
 
-const LoginPage = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
+const LoginPage = ({ onLogin }) => {
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [loginSuccessMessage, setLoginSuccessMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,17 +31,60 @@ const LoginPage = () => {
 
     return newErrors;
   };
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       setLoginSuccessMessage('');
       return;
     }
-    setLoginSuccessMessage(`Вход выполнен! Добро пожаловать!`);
-    setFormData({ email: '', password: '' });
-    setErrors({});
+
+    try {
+      const response = await fetch('http://localhost/LoginPage.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+      const result = await response.json();
+
+      if (result.status === 'success') {
+
+        localStorage.setItem('user', JSON.stringify({ email: result.email }));
+
+
+        if (onLogin) {
+          onLogin({ email: result.email });
+        }
+
+
+        setLoginSuccessMessage(`Вход выполнен! Добро пожаловать, ${result.email}`);
+
+
+        setFormData({ email: '', password: '' });
+        setErrors({});
+
+
+        navigate('/catalog');
+      } 
+      else 
+      {
+        setErrors({});
+        setLoginSuccessMessage('');
+        alert(result.message || 'Ошибка входа');
+      }
+    } catch (error) {
+      setErrors({});
+      setLoginSuccessMessage('');
+      alert('Ошибка соединения с сервером');
+    }
   };
 
   const toggleShowPassword = () => {
@@ -52,7 +94,7 @@ const LoginPage = () => {
   return (
     <div className="login-page">
       <h2>Войти</h2>
-      <form action="http://localhost/LoginPage.php" method='post' className="login-form" noValidate>
+      <form onSubmit={handleSubmit} className="login-form" noValidate>
         <div>
           <label>Email:</label>
           <input

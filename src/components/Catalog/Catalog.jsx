@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import './Catalog.css';
 import { useSearchParams } from 'react-router-dom';
-
+import './Catalog.css';
+import vkIcon from '../../assets/icons/VK.com-logo.svg.png';
+import telegramIcon from '../../assets/icons/Telegram_logo.svg.png';
+import messengerMaxIcon from '../../assets/icons/max.webp';
 const Catalog = ({ cart, setCart }) => {
   const [searchParams] = useSearchParams();
   const initialCategory = searchParams.get('category') || 'Все категории';
@@ -23,7 +25,6 @@ const Catalog = ({ cart, setCart }) => {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -73,7 +74,6 @@ const Catalog = ({ cart, setCart }) => {
     });
     addMessage(`${product.name} добавлен в корзину!`);
   };
-
 
   useEffect(() => {
     let result = [...products];
@@ -138,8 +138,7 @@ const Catalog = ({ cart, setCart }) => {
             <div className="category-filter">
               <h3>Категории:</h3>
               <div className="category-buttons">
-                {
-                  categories.map((category) => (
+                {categories.map((category) => (
                   <button
                     key={category}
                     className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
@@ -162,60 +161,122 @@ const Catalog = ({ cart, setCart }) => {
           </div>
         </div>
         <div className="products-grid">
-        {
-          filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => (
-          <div key={product.id} className="product-card">
-          <div className="product-card__image">
-        {
-          product.imageUrl ? (
-          <img
-            src={product.imageUrl}
-            alt={product.name}
-            className="product-image"
-            onError={(e) => {
-            
-              e.onerror = null;
-          }}
-          />
-        ) : (
-          <div className="no-image">Нет изображения</div>
-        )}
-        {
-        product.discount && (
-          <span className="discount-badge">-{product.discount}%</span>
-        )}
-      </div>
-      <div className="product-card__info">
-        <h3 className="product-card__title">{product.name}</h3>
-        <div className="product-rating">
-          <span className="rating-stars">
-            {'★'.repeat(Math.floor(Number(product.rating) || 0))}
-          </span>
-          <span className="rating-value">
-            {Number(product.rating).toFixed(1) || '—'}
-          </span>
-          <span className="rating-reviews">({product.reviews || 0})</span>
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map((product) => (
+              <div key={product.id} className="product-card">
+                <div className="product-card__image">
+                  {product.imageUrl ? (
+                    <img
+                      src={product.imageUrl}
+                      alt={product.name}
+                      className="product-image"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                      }}
+                    />
+                  ) : (
+                    <div className="no-image">Нет изображения</div>
+                  )}
+                  {product.discount && (
+                    <span className="discount-badge">-{product.discount}%</span>
+                  )}
+                </div>
+                <div className="product-card__info">
+                  <h3 className="product-card__title">{product.name}</h3>
+                  <div className="product-rating">
+                    <span className="rating-stars">
+                      {'★'.repeat(Math.floor(Number(product.rating) || 0))}
+                    </span>
+                    <span className="rating-value">
+                      {Number(product.rating).toFixed(1) || '—'}
+                    </span>
+                    <span className="rating-reviews">({product.reviews || 0})</span>
+                  </div>
+                  <div className="product-price">
+                    {product.oldPrice && <span className="price-old">{product.oldPrice} ₽</span>}
+                    <span className="price-current">{product.price} ₽</span>
+                  </div>
+                  <button
+                    className="btn btn--add-to-cart"
+                    onClick={() => addToCart(product)}
+                  >
+                    В корзину
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>Товары не найдены</p>
+          )}
         </div>
-        <div className="product-price">
-          {product.oldPrice && <span className="price-old">{product.oldPrice} ₽</span>}
-          <span className="price-current">{product.price} ₽</span>
-        </div>
-        <button
-          className="btn btn--add-to-cart"
-          onClick={() => addToCart(product)}
-        >
-          В корзину
-        </button>
       </div>
+
+
+      <footer className="footer">
+        <div className="footer__container">
+          <div className="footer__section">
+            <h3 className="footer__title">О магазине</h3>
+            <p>TechStore — ваш надёжный поставщик электроники и бытовой техники с 2026 года.</p>
+          </div>
+
+          <div className="footer__section">
+            <h3 className="footer__title">Категории</h3>
+            <ul className="footer__links">
+              <li><a href="/catalog?category=Смартфоны">Смартфоны</a></li>
+              <li><a href="/catalog?category=Ноутбуки">Ноутбуки</a></li>
+              <li><a href="/catalog?category=Телевизоры">Телевизоры</a></li>
+              <li><a href="/catalog?category=Аудиотехника">Аудиотехника</a></li>
+            </ul>
+          </div>
+
+          <div className="footer__section">
+            <h3 className="footer__title">Мы в соцсетях</h3>
+            <div className="footer__social">
+              <a
+                href="https://telegram.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-icon"
+                aria-label="Telegram"
+              >
+                <img src={telegramIcon} alt="Telegram" className="social-icon-img" />
+              </a>
+              <a
+                href="https://vk.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-icon"
+                aria-label="VKontakte"
+              >
+                <img src={vkIcon} alt="ВКонтакте" className="social-icon-img" />
+              </a>
+              <a
+                href="https://max.ru"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-icon"
+                aria-label="Messenger Max"
+              >
+                <img src={messengerMaxIcon} alt="Messenger Max" className="social-icon-img" />
+              </a>
+            </div>
+          </div>
+
+          <div className="footer__section" id="contacts-section">
+            <h3 className="footer__title">Контакты</h3>
+            <div className="footer__contacts">
+              <p>📞 +88005553535</p>
+              <p>✉️ Alex@techstore.ru</p>
+              <p>📍 г. Ростов-на-Дону, ул. Проспект Ленина</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="footer__bottom">
+          <p>&copy; 2026 TechStore. Все права защищены.</p>
+        </div>
+      </footer>
     </div>
-  ))
-):(
-      <p>Товары не найдены</p>
-)}
-    </div>
-    </div>
-  </div>
   );
 };
 

@@ -1,0 +1,21 @@
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+INSERT INTO `users` (`id`, `email`, `password`, `name`) VALUES
+(1, 'alex.@.com.', '12345678', 'alex'),
+(2, 'alex.@.mail.ru', '123456789', 'алекс'),
+(3, 'alexandar.@.com', '987654321', 'саша'),
+(5, '9ujhg@mail.ru', '123456789', 'alex');
+
+
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`);
+
+
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
