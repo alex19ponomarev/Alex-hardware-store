@@ -32,10 +32,6 @@ const Header = ({ cart = [], user = null, onLogout }) => {
     }
   };
 
-  const handleLogout = () => {
-    onLogout();
-  };
-
   return (
     <header className="header">
       <div className="header__container">
@@ -44,8 +40,26 @@ const Header = ({ cart = [], user = null, onLogout }) => {
           <span className="logo-tagline">Техника для жизни</span>
         </div>
 
-        <button className={`header__mobile-menu ${isMenuOpen ? 'open' : ''}`} onClick={toggleMenu}>
-          <span></span><span></span><span></span>
+
+        <button 
+          className={`header__mobile-menu ${isMenuOpen ? 'open' : ''}`} 
+          onClick={toggleMenu}
+          aria-label={isMenuOpen ? "Закрыть меню" : "Открыть меню"}
+          aria-expanded={isMenuOpen}
+        >
+          {!isMenuOpen && (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          )}
+          {isMenuOpen && (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          )}
         </button>
 
         <nav className={`header__nav ${isMenuOpen ? 'active' : ''}`} id="navigation" ref={menuRef}>
@@ -71,7 +85,7 @@ const Header = ({ cart = [], user = null, onLogout }) => {
             {user ? (
               <>
                 <span className="header__profile-info"> {user.email}</span>
-                <button onClick={handleLogout} className="logout-btn">Выйти</button>
+                <button onClick={onLogout} className="logout-btn">Выйти</button>
               </>
             ) : (
               <>
