@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS `cities` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `city_name` VARCHAR(255) NOT NULL
+);
+
+INSERT INTO `cities` (`city_name`) VALUES
+('Москва'),
+('Санкт-Петербург'),
+('Новосибирск'),
+('Екатеринбург'),
+('Казань'),
+('Нижний Новгород'),
+('Ростов-на-Дону');

@@ -15,6 +15,10 @@ if (!$data || !isset($data['order']))
     exit;
 }
 $order = $data['order'];
+
+
+$city = $order['city'] ?? 'Не указан'; 
+
 $items = $order['items'] ?? [];
 if (!is_array($items)) 
 {
@@ -55,16 +59,23 @@ if ($conn->connect_error)
     echo json_encode(['status' => 'error', 'message' => 'Ошибка соединения с базой']);
     exit;
 }
+
+
 $createTableSql = "CREATE TABLE IF NOT EXISTS orders (
   id INT AUTO_INCREMENT PRIMARY KEY,
+  city VARCHAR(255) NOT NULL,
   order_data TEXT NOT NULL,
   items_count INT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )";
 $conn->query($createTableSql);
-$stmt = $conn->prepare("INSERT INTO orders (order_data, items_count) VALUES (?, ?)");
+
+
+$stmt = $conn->prepare("INSERT INTO orders (city, order_data, items_count) VALUES (?, ?, ?)");
 $orderJson = json_encode($order);
-$stmt->bind_param('si', $orderJson, $itemsCount);
+
+
+$stmt->bind_param('ssi', $city, $orderJson, $itemsCount);
 
 if ($stmt->execute()) 
 {
