@@ -28,6 +28,7 @@
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s;
+  text-decoration: none;
 }
 .hero__btn:hover {
   background-color: #2980b9;

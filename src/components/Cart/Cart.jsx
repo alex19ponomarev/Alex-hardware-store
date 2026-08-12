@@ -7,6 +7,11 @@ const Cart = ({ cart, setCart }) => {
   const [isCityModalOpen, setIsCityModalOpen] = useState(false);
   const [selectedCity, setSelectedCity] = useState('');
   const [cities, setCities] = useState([]);
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [isPaymentPage, setIsPaymentPage] = useState(false); // страница оплаты
+  const [orderTotal, setOrderTotal] = useState(0); // сумма заказа
+  const [paymentSuccessMessage, setPaymentSuccessMessage] = useState(''); // сообщение об успехе оплаты
 
   const timeoutRef = useRef(null);
 
@@ -19,7 +24,6 @@ const Cart = ({ cart, setCart }) => {
           setCities(data);
           setSelectedCity(data[0]);
         } else {
-
           setCities([]);
         }
       })
@@ -81,12 +85,21 @@ const Cart = ({ cart, setCart }) => {
   };
 
   const handleConfirmOrder = () => {
+    if (!deliveryAddress.trim()) {
+      alert('Пожалуйста, введите адрес доставки.');
+      return;
+    }
     setIsCityModalOpen(false);
+    setIsAddressModalOpen(false);
+
+
+    setOrderTotal(totalPrice);
 
     const orderData = {
       items: cart,
       total: totalPrice,
       city: selectedCity,
+      address: deliveryAddress,
       date: new Date().toISOString(),
     };
 
@@ -100,8 +113,9 @@ const Cart = ({ cart, setCart }) => {
       .then((response) => response.json())
       .then((data) => {
         if (data.status === 'success') {
-          setNotification(`Заказ успешно отправлен в г. ${selectedCity}! Спасибо за покупку.`);
-          setCart([]);
+          setNotification(`Заказ успешно отправлен в г. ${selectedCity}!`);
+
+          setIsPaymentPage(true);
         } else {
           setNotification('Ошибка при отправке заказа: ' + data.message);
         }
@@ -119,15 +133,70 @@ const Cart = ({ cart, setCart }) => {
     addMessage('Корзина очищена.');
   };
 
+
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape') setIsCityModalOpen(false);
+      if (e.key === 'Escape') {
+        setIsCityModalOpen(false);
+        setIsAddressModalOpen(false);
+      }
     };
-    if (isCityModalOpen) {
+    if (isCityModalOpen || isAddressModalOpen) {
       window.addEventListener('keydown', handleKeyDown);
     }
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isCityModalOpen]);
+  }, [isCityModalOpen, isAddressModalOpen]);
+
+
+  if (isPaymentPage) {
+    return (
+      <div className="payment-page">
+        <h2>Оплата заказа</h2>
+
+        <p>Общая сумма: {orderTotal.toLocaleString('ru-RU')} руб.</p>
+
+        {paymentSuccessMessage && (
+          <div className="payment-success-message">{paymentSuccessMessage}</div>
+        )}
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            setPaymentSuccessMessage('Оплата прошла успешно! Спасибо за заказ.');
+
+            setCart([]);
+
+            setTimeout(() => {
+              setIsPaymentPage(false);
+              setPaymentSuccessMessage('');
+            }, 3000);
+          }}
+        >
+
+          <div>
+            <label>
+              Карта кредитная/дебетовая:
+              <input type="text" placeholder="Номер карты" required />
+            </label>
+          </div>
+          <div>
+            <label>
+              ММ / ГГ:
+              <input type="text" placeholder="Месяц/Год" required />
+            </label>
+          </div>
+          <div>
+            <label>
+              CVV:
+              <input type="text" placeholder="CVV" required />
+            </label>
+          </div>
+          <button type="submit">Оплатить</button>
+        </form>
+
+      </div>
+    );
+  }
 
   return (
     <div className="cart">
@@ -235,6 +304,7 @@ const Cart = ({ cart, setCart }) => {
         )}
       </div>
 
+
       {isCityModalOpen && (
         <div className="modal-overlay" onClick={() => setIsCityModalOpen(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -259,7 +329,43 @@ const Cart = ({ cart, setCart }) => {
             </div>
             <div className="modal-footer">
               <button className="btn-secondary" onClick={() => setIsCityModalOpen(false)}>Отмена</button>
-              <button className="btn-primary" onClick={handleConfirmOrder} disabled={!selectedCity}>
+              <button className="btn-primary" onClick={() => {
+                setIsCityModalOpen(false);
+                setIsAddressModalOpen(true);
+              }} disabled={!selectedCity}>
+                Далее
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {isAddressModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsAddressModalOpen(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Введите адрес доставки</h2>
+              <button className="close-btn" onClick={() => {
+                setIsAddressModalOpen(false);
+                setDeliveryAddress('');
+              }}>&times;</button>
+            </div>
+            <div className="modal-body">
+              <textarea
+                placeholder="Ваш адрес..."
+                value={deliveryAddress}
+                onChange={(e) => setDeliveryAddress(e.target.value)}
+                rows={4}
+                style={{ width: '100%' }}
+              />
+            </div>
+            <div className="modal-footer">
+              <button className="btn-secondary" onClick={() => {
+                setIsAddressModalOpen(false);
+                setDeliveryAddress('');
+              }}>Отмена</button>
+              <button className="btn-primary" onClick={handleConfirmOrder} disabled={!deliveryAddress.trim()}>
                 Подтвердить заказ
               </button>
             </div>

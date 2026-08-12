@@ -8,6 +8,8 @@ CREATE TABLE products (
     rating DECIMAL(3,1),
     reviews INT,
     image VARCHAR(255)
+    description text DEFAULT NULL,
+    specifications text DEFAULT NULL,
 );
 
 

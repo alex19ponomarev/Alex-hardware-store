@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './Catalog.css';
 import vkIcon from '../../assets/icons/VK.com-logo.svg.png';
 import telegramIcon from '../../assets/icons/Telegram_logo.svg.png';
 import messengerMaxIcon from '../../assets/icons/max.webp';
-const Catalog = ({ cart, setCart }) => {
-  const [searchParams] = useSearchParams();
-  const initialCategory = searchParams.get('category') || 'Все категории';
 
+const Catalog = ({ cart, setCart }) => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [categories] = useState([
+  const categories = [
     'Все категории',
     'Смартфоны',
     'Ноутбуки',
@@ -18,8 +16,9 @@ const Catalog = ({ cart, setCart }) => {
     'Аудиотехника',
     'Планшеты',
     'Умные часы'
-  ]);
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+  ];
+
+  const [selectedCategory, setSelectedCategory] = useState('Все категории');
   const [sortBy, setSortBy] = useState('popular');
   const [searchTerm, setSearchTerm] = useState('');
   const [message, setMessage] = useState('');
@@ -29,7 +28,6 @@ const Catalog = ({ cart, setCart }) => {
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
-      setError(null);
       try {
         const response = await fetch('http://localhost/Catalog.php');
         if (!response.ok) throw new Error('Ошибка сети или сервер недоступен');
@@ -107,6 +105,7 @@ const Catalog = ({ cart, setCart }) => {
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
+    setSearchTerm('');
   };
 
   const handleSortChange = (e) => {
@@ -121,9 +120,11 @@ const Catalog = ({ cart, setCart }) => {
     <div className="catalog">
       {loading && <div className="loading">Загрузка товаров...</div>}
       {error && <div className="error">{error}</div>}
+
       <div className="container">
         <h1 className="catalog__title">Каталог товаров</h1>
         {message && <div className="notification">{message}</div>}
+
         <div className="catalog-filters">
           <div className="search-box">
             <input
@@ -160,42 +161,47 @@ const Catalog = ({ cart, setCart }) => {
             </div>
           </div>
         </div>
+
         <div className="products-grid">
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
               <div key={product.id} className="product-card">
                 <div className="product-card__image">
-                  {product.imageUrl ? (
-                    <img
-                      src={product.imageUrl}
-                      alt={product.name}
-                      className="product-image"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                      }}
-                    />
-                  ) : (
-                    <div className="no-image">Нет изображения</div>
-                  )}
-                  {product.discount && (
-                    <span className="discount-badge">-{product.discount}%</span>
-                  )}
+                  <Link to={`/product/${product.id}`}>
+                    {product.imageUrl ? (
+                      <img
+                        src={product.imageUrl}
+                        alt={product.name}
+                        className="product-image"
+                      />
+                    ) : (
+                      <div className="no-image">Нет изображения</div>
+                    )}
+                    {product.discount && (
+                      <span className="discount-badge">-{product.discount}%</span>
+                    )}
+                  </Link>
                 </div>
                 <div className="product-card__info">
-                  <h3 className="product-card__title">{product.name}</h3>
-                  <div className="product-rating">
-                    <span className="rating-stars">
-                      {'★'.repeat(Math.floor(Number(product.rating) || 0))}
-                    </span>
-                    <span className="rating-value">
-                      {Number(product.rating).toFixed(1) || '—'}
-                    </span>
-                    <span className="rating-reviews">({product.reviews || 0})</span>
-                  </div>
-                  <div className="product-price">
-                    {product.oldPrice && <span className="price-old">{product.oldPrice} ₽</span>}
-                    <span className="price-current">{product.price} ₽</span>
-                  </div>
+                  <Link to={`/product/${product.id}`} className="product-link">
+                    <h3 className="product-card__title">{product.name}</h3>
+                    <div className="product-rating">
+                      <span className="rating-stars">
+                        {'★'.repeat(Math.floor(Number(product.rating) || 0))}
+                      </span>
+                      <span className="rating-value">
+                        {Number(product.rating).toFixed(1) || '—'}
+                      </span>
+                      <span className="rating-reviews">({product.reviews || 0})</span>
+                    </div>
+                    <div className="product-price">
+                      {product.oldPrice && (
+                        <span className="price-old">{product.oldPrice} ₽</span>
+                      )}
+                      <span className="price-current">{product.price} ₽</span>
+                    </div>
+                  </Link>
+
                   <button
                     className="btn btn--add-to-cart"
                     onClick={() => addToCart(product)}
@@ -206,11 +212,10 @@ const Catalog = ({ cart, setCart }) => {
               </div>
             ))
           ) : (
-            <p>Товары не найдены</p>
+            <div>Товары не найдены</div>
           )}
         </div>
       </div>
-
 
       <footer className="footer">
         <div className="footer__container">

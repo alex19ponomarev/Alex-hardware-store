@@ -35,9 +35,10 @@ const Header = ({ cart = [], user = null, onLogout }) => {
   return (
     <header className="header">
       <div className="header__container">
-        <div className="header__logo">
+        <div className="header__logo logo-animated">
+          <Link to="/">
           <h1>AlexTechStore</h1>
-          <span className="logo-tagline">Техника для жизни</span>
+          </Link>
         </div>
 
 

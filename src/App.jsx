@@ -10,6 +10,9 @@ import Header from './components/Header/Header';
 import RegisterPage from './components/RegisterPage/RegisterPage';
 import LoginPage from './components/LoginPage/LoginPage';
 
+
+import ProductPage from './components/ProductPage/ProductPage'; 
+
 function App() {
   const [cart, setCart] = useState(() => {
     const saved = localStorage.getItem('cart');
@@ -46,6 +49,10 @@ function App() {
         <Route path="/cart" element={<Cart cart={cart} setCart={setCart} />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+        
+
+        <Route path="/product/:id" element={<ProductPage cart={cart} setCart={setCart} />} />
+     
       </Routes>
     </BrowserRouter>
   );
