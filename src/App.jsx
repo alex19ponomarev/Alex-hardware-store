@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-
 import Home from './components/Home/Home';
 import Catalog from './components/Catalog/Catalog';
 import Sales from './components/Sales/Sales';
 import Cart from './components/Cart/Cart';
 import Header from './components/Header/Header';
-
 import RegisterPage from './components/RegisterPage/RegisterPage';
 import LoginPage from './components/LoginPage/LoginPage';
-
-
+import ProfilePage from './components/ProfilePage/ProfilePage';
 import ProductPage from './components/ProductPage/ProductPage'; 
-
 function App() {
   const [cart, setCart] = useState(() => {
     const saved = localStorage.getItem('cart');
@@ -51,8 +47,18 @@ function App() {
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
         
 
+        <Route 
+          path="/profile" 
+          element={
+            <ProfilePage 
+              user={user} 
+              onLogout={handleLogout} 
+              onUpdateUser={setUser} 
+            />
+          } 
+        />
+
         <Route path="/product/:id" element={<ProductPage cart={cart} setCart={setCart} />} />
-     
       </Routes>
     </BrowserRouter>
   );

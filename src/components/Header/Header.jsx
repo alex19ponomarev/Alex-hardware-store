@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Header.css';
 
 const Header = ({ cart = [], user = null, onLogout }) => {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -32,15 +33,20 @@ const Header = ({ cart = [], user = null, onLogout }) => {
     }
   };
 
+
+  const goToProfile = () => {
+    navigate('/profile');
+    closeMenu();
+  };
+
   return (
     <header className="header">
       <div className="header__container">
         <div className="header__logo logo-animated">
           <Link to="/">
-          <h1>AlexTechStore</h1>
+            <h1>AlexTechStore</h1>
           </Link>
         </div>
-
 
         <button 
           className={`header__mobile-menu ${isMenuOpen ? 'open' : ''}`} 
@@ -84,11 +90,21 @@ const Header = ({ cart = [], user = null, onLogout }) => {
 
           <div className="header__auth">
             {user ? (
-              <>
-                <span className="header__profile-info"> {user.email}</span>
+
+              <div className="user-dropdown">
+                <button 
+                  onClick={goToProfile} 
+                  className="header__profile-btn"
+                  title={`Профиль: ${user.email}`}
+                >
+                  <span className="user-avatar-small">{user.name?.[0]?.toUpperCase() || ''}</span>
+                  <span>{user.name || user.email}</span>
+                </button>
+                
                 <button onClick={onLogout} className="logout-btn">Выйти</button>
-              </>
+              </div>
             ) : (
+
               <>
                 <Link to="/login" className="header__auth-btn" onClick={closeMenu}>Войти</Link>
                 <Link to="/register" className="header__register-btn" onClick={closeMenu}>Регистрация</Link>
