@@ -43,7 +43,7 @@ const LoginPage = ({ onLogin }) => {
     }
 
     try {
-      const response = await fetch('http://localhost/LoginPage.php', {
+      const response = await fetch('/LoginPage.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

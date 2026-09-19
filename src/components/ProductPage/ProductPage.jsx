@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import './ProductPage.css';
+import { useFavorites } from '../useFavorites/useFavorites';
 
 const ProductPage = ({ cart, setCart }) => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [message, setMessage] = useState('');
+  const [added, setAdded] = useState(false);
+  const { toggleFavorite, isFavorite } = useFavorites();
 
   useEffect(() => {
     const fetchProduct = async () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`http://localhost/Product.php?id=${id}`);
-        if (!response.ok) throw new Error('Товар не найден или ошибка сервера');
+        const response = await fetch(`/Product.php?id=${id}`);
+        if (!response.ok) throw new Error('Товар не найден');
         const data = await response.json();
 
         if (data.success && data.data) {
@@ -33,157 +35,218 @@ const ProductPage = ({ cart, setCart }) => {
     fetchProduct();
   }, [id]);
 
-  const addMessage = (msg) => {
-    setMessage(msg);
-    setTimeout(() => setMessage(''), 3000);
-  };
-
   const addToCart = (item) => {
-    if (!setCart) {
-      console.error('setCart не передан в компонент ProductPage');
-      return;
-    }
+    if (!setCart) return;
 
-    setCart((prevCart) => {
-      const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
-      if (existingItem) {
-        return prevCart.map((cartItem) =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: (cartItem.quantity || 1) + 1 }
-            : cartItem
+    setCart((prev) => {
+      const existing = prev.find((p) => p.id === item.id);
+      if (existing) {
+        return prev.map((p) =>
+          p.id === item.id ? { ...p, quantity: (p.quantity || 1) + 1 } : p
         );
       }
-      return [...prevCart, { ...item, quantity: 1 }];
+      return [...prev, { ...item, quantity: 1 }];
     });
-    addMessage(`${item.name} добавлен в корзину!`);
+
+    setAdded(true);
+    setTimeout(() => setAdded(false), 2000);
+  };
+
+  const parseSpecs = (specs) => {
+    if (!specs) return [];
+
+    if (typeof specs === 'object' && !Array.isArray(specs)) {
+      return Object.entries(specs).map(([key, value]) => ({
+        key,
+        value: typeof value === 'object' ? JSON.stringify(value) : String(value),
+      }));
+    }
+
+    const lines = String(specs)
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter(Boolean);
+
+    const result = [];
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (line.endsWith(':') && line.length < 80) {
+        const key = line.slice(0, -1);
+        const next = lines[i + 1];
+        if (next && !next.endsWith(':')) {
+          result.push({ key, value: next });
+          i++;
+        } else {
+          result.push({ key, value: '' });
+        }
+      }
+    }
+    return result;
+  };
+
+  const renderStars = (rating) => {
+    const num = Math.floor(Number(rating) || 0);
+    return '★'.repeat(num) + '☆'.repeat(5 - num);
   };
 
   if (loading) {
-    return <div className="page-loader">Загрузка товара...</div>;
-  }
-
-  if (error || !product) {
     return (
-      <div className="error-page">
-        <h1>Ошибка</h1>
-        <p>{error || 'Товар не найден'}</p>
-        <Link to="/catalog" className="btn btn--primary">Вернуться в каталог</Link>
+      <div className="product-page">
+        <div className="product-loader">Загрузка товара...</div>
       </div>
     );
   }
 
-  const renderValue = (val) => {
-    if (val === null || val === undefined) return '—';
+  if (error || !product) {
+    return (
+      <div className="product-page">
+        <nav className="breadcrumbs" aria-label="Навигация">
+          <Link to="/" className="breadcrumbs-link">Главная</Link>
+          <span className="breadcrumbs-sep">/</span>
+          <Link to="/catalog" className="breadcrumbs-link">Каталог</Link>
+          <span className="breadcrumbs-sep">/</span>
+          <span className="breadcrumbs-current">Ошибка</span>
+        </nav>
 
-    if (typeof val === 'object' && !Array.isArray(val)) {
-      return (
-        <ul style={{ margin: 0, paddingLeft: '15px' }}>
-          {Object.entries(val).map(([subKey, subVal]) => (
-            <li key={subKey} style={{ marginBottom: '4px', listStyle: 'none' }}>
-              <strong>{subKey}:</strong> {renderValue(subVal)}
-            </li>
-          ))}
-        </ul>
-      );
-    }
+        <div className="product-error">
+          <h2>Ошибка</h2>
+          <p>{error || 'Товар не найден'}</p>
+          <Link to="/catalog" className="product-back-btn">← Вернуться в каталог</Link>
+        </div>
+      </div>
+    );
+  }
 
-    if (Array.isArray(val)) {
-      return val.join(', ');
-    }
-
-    return String(val);
-  };
+  const specsList = parseSpecs(product.specifications);
+  const fav = isFavorite(product.id);
 
   return (
     <div className="product-page">
-      {message && <div className="notification">{message}</div>}
+      <nav className="breadcrumbs" aria-label="Навигация">
+        <Link to="/" className="breadcrumbs-link">Главная</Link>
+        <span className="breadcrumbs-sep">/</span>
+        <Link to="/catalog" className="breadcrumbs-link">Каталог</Link>
+        {product.category && (
+          <>
+            <span className="breadcrumbs-sep">/</span>
+            <Link
+              to={`/catalog?category=${encodeURIComponent(product.category)}`}
+              className="breadcrumbs-link"
+            >
+              {product.category}
+            </Link>
+          </>
+        )}
+        <span className="breadcrumbs-sep">/</span>
+        <span className="breadcrumbs-current" title={product.name}>
+          {product.name}
+        </span>
+      </nav>
 
-      <header className="product-header">
-        <Link to="/catalog" className="back-link">
-          <span className="icon">←</span> Назад в каталог
-        </Link>
-      </header>
-
-      <main className="product-main">
+      <div className="product-main">
         <div className="product-gallery">
           {product.imageUrl ? (
-            <img src={product.imageUrl} alt={product.name} className="main-image" />
+            <img
+              src={product.imageUrl}
+              alt={product.name}
+              className="product-image"
+            />
           ) : (
-            <div className="no-image-placeholder">Нет изображения</div>
+            <div className="product-no-image">Нет изображения</div>
           )}
 
-          {product.discount && (
-            <div className="discount-badge">-{product.discount}%</div>
+          {product.discount > 0 && (
+            <span className="product-discount">-{product.discount}%</span>
           )}
+
+          <button
+            type="button"
+            className={`product-gallery-fav ${fav ? 'active' : ''}`}
+            onClick={() => toggleFavorite(product.id)}
+            aria-label={fav ? 'Убрать из избранного' : 'В избранное'}
+            title={fav ? 'Убрать из избранного' : 'В избранное'}
+          >
+            {fav ? '❤️' : '🤍'}
+          </button>
         </div>
 
-        <div className="product-details">
+        <div className="product-info">
           <h1 className="product-title">{product.name}</h1>
 
           <div className="product-meta">
-            <span className="category-tag">{product.category || 'Электроника'}</span>
-
-            <div className="rating-block">
-              <span className="stars">
-                {'★'.repeat(Math.floor(Number(product.rating) || 0))}
-              </span>
-              <span className="rating-value">
-                {Number(product.rating).toFixed(1)} ({product.reviews || 0} отзывов)
-              </span>
-            </div>
-          </div>
-
-          <div className="price-block">
-            {product.oldPrice && (
-              <span className="price-old">{product.oldPrice} ₽</span>
+            {product.category && (
+              <span className="product-category">{product.category}</span>
             )}
-            <span className="price-current">{product.price} ₽</span>
+
+            {product.rating > 0 && (
+              <div className="product-rating">
+                <span className="product-stars">{renderStars(product.rating)}</span>
+                <span className="product-rating-value">
+                  {Number(product.rating).toFixed(1)}
+                </span>
+                <span className="product-reviews">
+                  ({product.reviews || 0} отзывов)
+                </span>
+              </div>
+            )}
           </div>
 
-          <p className="product-description">
-            {product.description || 'Описание товара отсутствует.'}
-          </p>
+          <div className="product-price-block">
+            {product.oldPrice && (
+              <span className="product-price-old">{product.oldPrice} ₽</span>
+            )}
+            <span className="product-price-current">{product.price} ₽</span>
+          </div>
 
-          <div className="actions">
+          <div className="product-stock">
+            <span className="product-stock-dot"></span>
+            <span>В наличии</span>
+          </div>
+
+          <div className="product-actions">
             <button
-              className={`btn btn--add-to-cart ${!product.inStock ? 'disabled' : ''}`}
+              className={`product-add-btn ${added ? 'added' : ''}`}
               onClick={() => addToCart(product)}
-              disabled={!product.inStock}
             >
-              {product.inStock ? 'В корзину' : 'Нет в наличии'}
+              {added ? '✓ Добавлено' : 'В корзину'}
             </button>
 
-            {!product.inStock && (
-              <button className="btn btn--outline">Уведомить о поступлении</button>
-            )}
+            <button
+              type="button"
+              className={`product-fav-btn ${fav ? 'active' : ''}`}
+              onClick={() => toggleFavorite(product.id)}
+              title={fav ? 'Убрать из избранного' : 'В избранное'}
+            >
+              {fav ? '❤️ В избранном' : '🤍 В избранное'}
+            </button>
+
+            <Link to="/cart" className="product-go-cart-btn">
+              Перейти в корзину
+            </Link>
           </div>
-
-
-          {product.specifications && (
-            <section className="specifications">
-              <h3>Характеристики</h3>
-              {typeof product.specifications === 'object' && !Array.isArray(product.specifications) ? (
-                <ul className="spec-list">
-                  {Object.entries(product.specifications).map(([key, value]) => (
-                    <li key={key} className="spec-item">
-                      <span className="spec-label">{key}:</span>
-                      <span className="spec-value">{renderValue(value)}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div className="specs-raw-text" style={{ whiteSpace: 'pre-wrap', color: '#555' }}>
-                  {product.specifications}
-                </div>
-              )}
-            </section>
-          )}
         </div>
-      </main>
+      </div>
 
-      <footer className="product-footer">
-        <p>&copy; 2026 TechStore. Все права защищены.</p>
-      </footer>
+      {specsList.length > 0 && (
+        <section className="product-specs">
+          <h2 className="product-specs-title">Характеристики</h2>
+          <ul className="spec-list">
+            {specsList.map(({ key, value }, idx) => (
+              <li key={`${key}-${idx}`} className="spec-item">
+                <span className="spec-label">{key}</span>
+                <span className="spec-value">{value || '—'}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <section className="product-description-block">
+        <h2 className="product-description-title">Описание</h2>
+        <p className="product-description">
+          {product.description || 'Описание товара отсутствует.'}
+        </p>
+      </section>
     </div>
   );
 };

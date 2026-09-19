@@ -1,10 +1,4 @@
 <?php
-
-header("Access-Control-Allow-Origin: http://localhost:5173");
-header("Access-Control-Allow-Methods: POST");
-header("Access-Control-Allow-Headers: Content-Type");
-header("Access-Control-Allow-Credentials: true");
-
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit;
@@ -15,11 +9,12 @@ session_start();
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
-    $server = "localhost";
-    $dbname = "alextechstoredatebei";
-    $dblogin = "root";
-    $dbpass = "";
-    $dbstr = "mysql:host=$server;dbname=$dbname";
+
+    $server  = "localhost";
+    $dbname  = "alexpocd_alextec";
+    $dblogin = "alexpocd_alextec";
+    $dbpass  = "YOUR_DB_PASSWORD";
+    $dbstr   = "mysql:host=$server;dbname=$dbname;charset=utf8mb4";
 
     try {
         $pdo = new PDO($dbstr, $dblogin, $dbpass);
@@ -30,8 +25,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user && $password == $user['password']) {
-
-
             setcookie('user_email', $user['email'], [
                 'expires' => time() + 86400,
                 'path' => '/',
@@ -40,10 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'SameSite' => 'Lax'
             ]);
 
-
-            $_SESSION['user'] = [
-                'email' => $user['email']
-            ];
+            $_SESSION['user'] = ['email' => $user['email']];
 
             echo json_encode(['status' => 'success', 'email' => $user['email']]);
             exit;

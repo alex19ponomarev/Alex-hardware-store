@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from './components/Home/Home';
+import { HashRouter, Routes, Route } from 'react-router-dom';
+import Home from './components/home/Home';
 import Catalog from './components/Catalog/Catalog';
 import Sales from './components/Sales/Sales';
 import Cart from './components/Cart/Cart';
@@ -8,7 +8,10 @@ import Header from './components/Header/Header';
 import RegisterPage from './components/RegisterPage/RegisterPage';
 import LoginPage from './components/LoginPage/LoginPage';
 import ProfilePage from './components/ProfilePage/ProfilePage';
-import ProductPage from './components/ProductPage/ProductPage'; 
+import ProductPage from './components/ProductPage/ProductPage';
+import Admin from './components/Admin/Admin';
+import PrivacyPolicy from './components/PrivacyPolicy/PrivacyPolicy';
+
 function App() {
   const [cart, setCart] = useState(() => {
     const saved = localStorage.getItem('cart');
@@ -35,7 +38,7 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Header cart={cart} user={user} onLogout={handleLogout} />
 
       <Routes>
@@ -45,22 +48,24 @@ function App() {
         <Route path="/cart" element={<Cart cart={cart} setCart={setCart} />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
-        
+        <Route path="/privacy" element={<PrivacyPolicy />} />
 
-        <Route 
-          path="/profile" 
+        <Route
+          path="/profile"
           element={
-            <ProfilePage 
-              user={user} 
-              onLogout={handleLogout} 
-              onUpdateUser={setUser} 
+            <ProfilePage
+              user={user}
+              onLogout={handleLogout}
+              onUpdateUser={setUser}
             />
-          } 
+          }
         />
 
         <Route path="/product/:id" element={<ProductPage cart={cart} setCart={setCart} />} />
+
+        <Route path="/admin" element={<Admin />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
