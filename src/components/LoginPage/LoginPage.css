@@ -6,6 +6,7 @@
   border: 1px solid #ddd;
   border-radius: 8px;
   box-sizing: border-box;
+  text-align: left;
 }
 
 .login-page h2 {
@@ -122,6 +123,7 @@
   margin-top: 4px;
   color: #e74c3c;
   font-size: 12px;
+  text-align: left;
 }
 
 .success-message {
@@ -136,42 +138,69 @@
   text-align: center;
 }
 
-@media (max-width: 480px) {
-  .login-page {
-    max-width: 90%;
-    margin: 20px auto;
-    padding: 18px;
-  }
+.login-agreement {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  background: #f8f9fa;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  text-align: left;
+  transition: border-color 0.2s, background 0.2s;
+}
 
-  .login-page h2 {
-    font-size: 1.3rem;
-  }
+.login-agreement-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  cursor: pointer;
+  margin: 0;
+  font-weight: normal;
+  font-size: 13px;
+  text-align: left;
+}
 
-  .login-form label {
-    font-size: 13px;
-  }
+.login-agreement-label input[type="checkbox"] {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  margin: 2px 0 0;
+  padding: 0;
+  accent-color: #4caf50;
+  cursor: pointer;
+}
 
-  .login-form input,
-  .password-wrapper input {
-    padding: 9px 10px;
-    font-size: 14px;
-  }
+.login-agreement-text {
+  display: block;
+  color: #444;
+  line-height: 1.5;
+  user-select: none;
+  text-align: left;
+}
 
-  .toggle-password {
-    width: 40px;
-    font-size: 16px;
-  }
+.login-agreement-text a {
+  color: #3498db;
+  text-decoration: underline;
+  font-weight: 600;
+}
 
-  .login-form button[type="submit"] {
-    padding: 11px;
-    font-size: 14px;
-  }
+.login-agreement-text a:hover {
+  color: #2980b9;
+}
 
-  .error-message {
-    font-size: 11px;
-  }
+.login-register-link {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+}
 
-  .success-message {
-    font-size: 13px;
-  }
+.login-register-link a {
+  color: #3498db;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-register-link a:hover {
+  text-decoration: underline;
 }

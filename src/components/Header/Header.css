@@ -252,7 +252,6 @@
   transform: translateY(-10px) rotate(-45deg);
 }
 
-
 .header-overlay {
   position: fixed;
   top: 0;
@@ -431,7 +430,6 @@
   white-space: nowrap;
 }
 
-
 .header-menu li a.header-admin-link {
   color: #e74c3c;
   font-weight: 700;
@@ -445,7 +443,6 @@
   background-color: #e74c3c;
 }
 
-
 .header-drawer-nav a.header-admin-link {
   color: #e74c3c;
   font-weight: 700;
@@ -454,26 +451,4 @@
 .header-drawer-nav a.header-admin-link:hover {
   background: #fdecea;
   color: #c0392b;
-}
-
-@media (max-width: 768px) {
-  .header-nav,
-  .header-actions {
-    display: none;
-  }
-
-  .header-burger {
-    display: flex;
-  }
-
-  .header-logo h1 {
-    font-size: 1.6rem;
-  }
-}
-
-@media (min-width: 769px) {
-  .header-drawer,
-  .header-overlay {
-    display: none;
-  }
 }

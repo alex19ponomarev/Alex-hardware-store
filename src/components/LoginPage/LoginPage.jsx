@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './LoginPage.css';
 
 const LoginPage = ({ onLogin }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [agree, setAgree] = useState(false);
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [loginSuccessMessage, setLoginSuccessMessage] = useState('');
@@ -12,6 +13,9 @@ const LoginPage = ({ onLogin }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevData => ({ ...prevData, [name]: value }));
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
   const validate = () => {
@@ -27,6 +31,10 @@ const LoginPage = ({ onLogin }) => {
       newErrors.password = 'Пожалуйста, введите пароль';
     } else if (formData.password.length < 8) {
       newErrors.password = 'Пароль должен быть не менее 8 символов';
+    }
+
+    if (!agree) {
+      newErrors.agree = 'Необходимо согласие с политикой конфиденциальности';
     }
 
     return newErrors;
@@ -56,26 +64,19 @@ const LoginPage = ({ onLogin }) => {
       const result = await response.json();
 
       if (result.status === 'success') {
-
         localStorage.setItem('user', JSON.stringify({ email: result.email }));
-
 
         if (onLogin) {
           onLogin({ email: result.email });
         }
 
-
         setLoginSuccessMessage(`Вход выполнен! Добро пожаловать, ${result.email}`);
-
-
         setFormData({ email: '', password: '' });
+        setAgree(false);
         setErrors({});
 
-
         navigate('/catalog');
-      } 
-      else 
-      {
+      } else {
         setErrors({});
         setLoginSuccessMessage('');
         alert(result.message || 'Ошибка входа');
@@ -129,9 +130,36 @@ const LoginPage = ({ onLogin }) => {
           </div>
           {errors.password && <div className="error-message">{errors.password}</div>}
         </div>
+
+
+        <div className="login-agreement">
+          <label className="login-agreement-label">
+            <input
+              type="checkbox"
+              checked={agree}
+              onChange={(e) => {
+                setAgree(e.target.checked);
+                if (errors.agree) setErrors(prev => ({ ...prev, agree: '' }));
+              }}
+            />
+            <span className="login-agreement-text">
+              Я согласен с{' '}
+              <Link to="/privacy" target="_blank" rel="noopener noreferrer">
+                политикой конфиденциальности
+              </Link>{' '}
+              и даю согласие на обработку персональных данных
+            </span>
+          </label>
+          {errors.agree && <div className="error-message">{errors.agree}</div>}
+        </div>
+
         <button type="submit">Войти</button>
       </form>
       {loginSuccessMessage && <div className="success-message">{loginSuccessMessage}</div>}
+
+      <div className="login-register-link">
+        Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
+      </div>
     </div>
   );
 };

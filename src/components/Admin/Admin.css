@@ -109,7 +109,7 @@
 .admin-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 600px; /* на мобиле таблица будет скроллиться, а не рваться */
+  min-width: 600px;
 }
 
 .admin-table th,
@@ -230,7 +230,6 @@
   font-size: 15px;
 }
 
-/* ===== Модалка редактирования (формы) ===== */
 .admin-modal-overlay {
   position: fixed;
   inset: 0;
@@ -292,7 +291,6 @@
   border-top: 1px solid #eef0f2;
 }
 
-/* ===== Формы ===== */
 .admin-form { display: flex; flex-direction: column; gap: 14px; }
 
 .admin-form label {
@@ -330,7 +328,6 @@
 
 .admin-form textarea { resize: vertical; min-height: 80px; }
 
-/* ===== Загрузка картинки ===== */
 .image-upload {
   display: flex;
   gap: 8px;
@@ -348,7 +345,6 @@
   border: 1px solid #eef0f2;
 }
 
-/* ===== Toast ===== */
 .admin-toast {
   position: fixed;
   bottom: 24px;
@@ -370,7 +366,6 @@
   to   { opacity: 1; transform: translate(-50%, 0); }
 }
 
-/* ===== Служебные состояния ===== */
 .admin-loading,
 .admin-empty {
   padding: 40px 20px;
@@ -476,43 +471,11 @@
 .confirm-btn:hover { transform: translateY(-1px); }
 .confirm-btn:active { transform: translateY(0); }
 
-.confirm-btn--cancel {
-  background: #eef0f2;
-  color: #2c3e50;
-}
-
+.confirm-btn--cancel { background: #eef0f2; color: #2c3e50; }
 .confirm-btn--cancel:hover { background: #dfe4e8; }
-
-.confirm-btn--danger {
-  background: #e74c3c;
-  color: #fff;
-}
-
+.confirm-btn--danger { background: #e74c3c; color: #fff; }
 .confirm-btn--danger:hover { background: #c0392b; }
-
-.confirm-btn--warning {
-  background: #f39c12;
-  color: #fff;
-}
-
+.confirm-btn--warning { background: #f39c12; color: #fff; }
 .confirm-btn--warning:hover { background: #d68910; }
-
-.confirm-btn--info {
-  background: #3498db;
-  color: #fff;
-}
-
+.confirm-btn--info { background: #3498db; color: #fff; }
 .confirm-btn--info:hover { background: #2980b9; }
-
-@media (max-width: 768px) {
-  .admin { padding: 20px 12px 40px; }
-  .admin-header { flex-direction: column; align-items: flex-start; gap: 12px; }
-  .admin-header h1 { font-size: 1.5rem; }
-  .admin-tab { padding: 8px 12px; font-size: 13px; }
-  .admin-content { padding: 14px; border-radius: 10px; }
-  .admin-table th, .admin-table td { padding: 8px 10px; font-size: 13px; }
-  .admin-toolbar h2 { font-size: 1.1rem; }
-  .confirm-modal { padding: 22px 18px 16px; }
-  .confirm-icon { width: 56px; height: 56px; font-size: 26px; }
-  .confirm-title { font-size: 1.1rem; }
-}

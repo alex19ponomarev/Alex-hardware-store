@@ -12,13 +12,28 @@ const Sales = ({ cart, setCart }) => {
   const timeoutRef = useRef(null);
   const { toggleFavorite, isFavorite } = useFavorites();
 
+
+  const isSaleActive = (product) => {
+    if (!product.saleEnds) return true; // если даты нет — считаем активной
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const end = new Date(product.saleEnds);
+    end.setHours(0, 0, 0, 0);
+
+    return end >= today;
+  };
+
   useEffect(() => {
     fetch('/Sales.php')
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          setSalesProducts(data.data);
-          setFilteredProducts(data.data);
+
+          const activeProducts = data.data.filter(isSaleActive);
+          setSalesProducts(activeProducts);
+          setFilteredProducts(activeProducts);
         } else {
           console.error('Ошибка загрузки данных:', data.message);
         }
@@ -76,7 +91,7 @@ const Sales = ({ cart, setCart }) => {
     today.setHours(0, 0, 0, 0);
 
     if (!product.saleEnds) {
-      return { isActive: true, daysLeft: null, text: 'Акция действует', icon: '⏰', urgent: false };
+      return { daysLeft: null, text: 'Акция действует', icon: '⏰', urgent: false };
     }
 
     const end = new Date(product.saleEnds);
@@ -84,20 +99,16 @@ const Sales = ({ cart, setCart }) => {
     const diffMs = end - today;
     const daysLeft = Math.round(diffMs / (1000 * 60 * 60 * 24));
 
-    if (daysLeft < 0) {
-      return { isActive: false, daysLeft: null, text: 'Акция завершена', icon: '❌', urgent: false };
-    }
     if (daysLeft === 0) {
-      return { isActive: true, daysLeft: 0, text: 'Последний день акции!', icon: '⏳', urgent: true };
+      return { daysLeft: 0, text: 'Последний день акции!', icon: '⏳', urgent: true };
     }
     if (daysLeft === 1) {
-      return { isActive: true, daysLeft: 1, text: 'Остался 1 день', icon: '⏳', urgent: true };
+      return { daysLeft: 1, text: 'Остался 1 день', icon: '⏳', urgent: true };
     }
     if (daysLeft <= 3) {
-      return { isActive: true, daysLeft, text: `Осталось ${daysLeft} дня`, icon: '⏳', urgent: true };
+      return { daysLeft, text: `Осталось ${daysLeft} дня`, icon: '⏳', urgent: true };
     }
     return {
-      isActive: true,
       daysLeft,
       text: `Акция действует до: ${formatDate(product.saleEnds)}`,
       icon: '⏰',
@@ -135,14 +146,12 @@ const Sales = ({ cart, setCart }) => {
           <div className="sales-grid">
             {filteredProducts.map((product) => {
               const status = getStatus(product);
-              const { isActive, text, icon, urgent } = status;
+              const { text, icon, urgent } = status;
 
               return (
                 <div
                   key={product.id}
-                  className={`sale-card ${!isActive ? 'sale-card--expired' : ''} ${
-                    urgent ? 'sale-card--urgent' : ''
-                  }`}
+                  className={`sale-card ${urgent ? 'sale-card--urgent' : ''}`}
                 >
                   <div className="sale-card-image">
                     <button
@@ -160,13 +169,9 @@ const Sales = ({ cart, setCart }) => {
 
                     <img src={product.imageUrl} alt={product.name} className="sale-card-img" />
 
-                    {isActive && product.discount ? (
+                    {product.discount ? (
                       <span className="discount-badge">-{product.discount}%</span>
                     ) : null}
-
-                    {!isActive && (
-                      <span className="expired-badge">Завершено</span>
-                    )}
                   </div>
 
                   <div className="sale-card-info">
@@ -174,21 +179,15 @@ const Sales = ({ cart, setCart }) => {
                     <div className="sale-card-category">Категория: {product.category}</div>
 
                     <div className="product-price">
-                      {isActive && product.oldPrice ? (
+                      {product.oldPrice ? (
                         <span className="price-old">{product.oldPrice} ₽</span>
                       ) : null}
-                      <span className={`price-current ${!isActive ? 'price-current--expired' : ''}`}>
-                        {product.price} ₽
-                      </span>
+                      <span className="price-current">{product.price} ₽</span>
                     </div>
 
                     <div
                       className={`sale-card-timer ${
-                        !isActive
-                          ? 'sale-card-timer--expired'
-                          : urgent
-                          ? 'sale-card-timer--urgent'
-                          : ''
+                        urgent ? 'sale-card-timer--urgent' : ''
                       }`}
                     >
                       <span className="sale-card-timer-icon">{icon}</span>

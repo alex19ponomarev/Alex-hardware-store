@@ -58,7 +58,6 @@
   color: #bdc3c7;
 }
 
-
 .footer-social {
   display: flex;
   gap: 14px;
@@ -90,27 +89,4 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-}
-
-
-@media (max-width: 768px) {
-  .footer {
-    padding: 20px 10px;
-  }
-
-  .footer-container {
-    grid-template-columns: 1fr;
-  }
-
-  .social-icon {
-    width: 28px;
-    height: 28px;
-  }
-}
-
-@media (max-width: 480px) {
-  .social-icon {
-    width: 26px;
-    height: 26px;
-  }
 }

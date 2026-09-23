@@ -11,6 +11,7 @@ import ProfilePage from './components/ProfilePage/ProfilePage';
 import ProductPage from './components/ProductPage/ProductPage';
 import Admin from './components/Admin/Admin';
 import PrivacyPolicy from './components/PrivacyPolicy/PrivacyPolicy';
+import CookieBanner from './components/CookieBanner/CookieBanner';
 
 function App() {
   const [cart, setCart] = useState(() => {
@@ -65,6 +66,8 @@ function App() {
 
         <Route path="/admin" element={<Admin />} />
       </Routes>
+
+      <CookieBanner />
     </HashRouter>
   );
 }

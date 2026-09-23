@@ -97,7 +97,6 @@
   text-align: center;
 }
 
-
 .register-agreement {
   margin-bottom: 16px;
   padding: 14px 16px;
@@ -148,7 +147,6 @@
   color: #2980b9;
 }
 
-
 .register-login-link {
   margin-top: 18px;
   text-align: center;
@@ -164,54 +162,4 @@
 
 .register-login-link a:hover {
   text-decoration: underline;
-}
-
-
-@media (max-width: 480px) {
-  .register-page {
-    max-width: 90%;
-    margin: 20px auto;
-    padding: 18px;
-  }
-
-  .register-page h2 {
-    font-size: 1.3rem;
-  }
-
-  .register-form label {
-    font-size: 13px;
-  }
-
-  .register-form input {
-    padding: 9px 10px;
-    font-size: 14px;
-  }
-
-  .register-form button[type="submit"] {
-    padding: 11px;
-    font-size: 14px;
-  }
-
-  .error-message {
-    font-size: 11px;
-  }
-
-  .success-message {
-    font-size: 13px;
-  }
-
-  .register-agreement {
-    padding: 12px 14px;
-  }
-
-  .register-agreement-label {
-    font-size: 12px;
-    gap: 10px;
-  }
-
-  .register-agreement-label input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    min-width: 16px;
-  }
 }
