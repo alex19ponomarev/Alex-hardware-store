@@ -331,33 +331,82 @@
   border-color: #e91e63;
 }
 
-.product-specs {
+.accordion {
   margin-top: 24px;
-  padding: 28px;
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
 }
 
-.product-specs-title {
+.accordion-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  margin: 0 0 20px;
-  padding-bottom: 16px;
-  border-bottom: 2px solid #f0f0f0;
+  width: 100%;
+  padding: 20px 28px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: background 0.2s;
+}
+
+.accordion-header:hover {
+  background: #f8f9fa;
+}
+
+.accordion-header.open {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.accordion-title {
+  position: relative;
+  padding-left: 20px;
   font-size: 22px;
   font-weight: 700;
   color: #2c3e50;
 }
 
-.product-specs-title::before {
+.accordion-title::before {
   content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
   display: block;
   width: 4px;
   height: 24px;
   background: #3498db;
   border-radius: 2px;
+}
+
+.accordion-arrow {
+  flex-shrink: 0;
+  font-size: 18px;
+  color: #7f8c8d;
+  transition: transform 0.25s ease;
+}
+
+.accordion-header.open .accordion-arrow {
+  transform: rotate(180deg);
+}
+
+.accordion-body {
+  padding: 20px 28px 24px;
+  animation: accordionOpen 0.25s ease;
+}
+
+@keyframes accordionOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .spec-list {
@@ -396,35 +445,6 @@
   font-weight: 600;
   word-break: break-word;
   white-space: pre-wrap;
-}
-
-.product-description-block {
-  margin-top: 24px;
-  padding: 28px;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-}
-
-.product-description-title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 0 0 16px;
-  padding-bottom: 16px;
-  border-bottom: 2px solid #f0f0f0;
-  font-size: 22px;
-  font-weight: 700;
-  color: #2c3e50;
-}
-
-.product-description-title::before {
-  content: '';
-  display: block;
-  width: 4px;
-  height: 24px;
-  background: #3498db;
-  border-radius: 2px;
 }
 
 .product-description {

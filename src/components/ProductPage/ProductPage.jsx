@@ -12,6 +12,16 @@ const ProductPage = ({ cart, setCart }) => {
   const [added, setAdded] = useState(false);
   const { toggleFavorite, isFavorite } = useFavorites();
 
+
+  const [openSections, setOpenSections] = useState({
+    specs: true,
+    description: true,
+  });
+
+  const toggleSection = (key) => {
+    setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
   useEffect(() => {
     const fetchProduct = async () => {
       setLoading(true);
@@ -235,26 +245,54 @@ const ProductPage = ({ cart, setCart }) => {
           </div>
         </div>
 
+
         {specsList.length > 0 && (
-          <section className="product-specs">
-            <h2 className="product-specs-title">Характеристики</h2>
-            <ul className="spec-list">
-              {specsList.map(({ key, value }, idx) => (
-                <li key={`${key}-${idx}`} className="spec-item">
-                  <span className="spec-label">{key}</span>
-                  <span className="spec-value">{value || '—'}</span>
-                </li>
-              ))}
-            </ul>
+          <section className="accordion">
+            <button
+              type="button"
+              className={`accordion-header ${openSections.specs ? 'open' : ''}`}
+              onClick={() => toggleSection('specs')}
+              aria-expanded={openSections.specs}
+            >
+              <span className="accordion-title">Характеристики</span>
+              <span className="accordion-arrow">▾</span>
+            </button>
+
+            {openSections.specs && (
+              <div className="accordion-body">
+                <ul className="spec-list">
+                  {specsList.map(({ key, value }, idx) => (
+                    <li key={`${key}-${idx}`} className="spec-item">
+                      <span className="spec-label">{key}</span>
+                      <span className="spec-value">{value || '—'}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </section>
         )}
 
-        <section className="product-description-block">
-          <h2 className="product-description-title">Описание</h2>
-          <p className="product-description">
-            {product.description || 'Описание товара отсутствует.'}
-          </p>
+        <section className="accordion">
+          <button
+            type="button"
+            className={`accordion-header ${openSections.description ? 'open' : ''}`}
+            onClick={() => toggleSection('description')}
+            aria-expanded={openSections.description}
+          >
+            <span className="accordion-title">Описание</span>
+            <span className="accordion-arrow">▾</span>
+          </button>
+
+          {openSections.description && (
+            <div className="accordion-body">
+              <p className="product-description">
+                {product.description || 'Описание товара отсутствует.'}
+              </p>
+            </div>
+          )}
         </section>
+
       </div>
 
       <Footer />

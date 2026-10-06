@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Home from './components/home/Home';
 import Catalog from './components/Catalog/Catalog';
 import Sales from './components/Sales/Sales';
@@ -12,6 +12,20 @@ import ProductPage from './components/ProductPage/ProductPage';
 import Admin from './components/Admin/Admin';
 import PrivacyPolicy from './components/PrivacyPolicy/PrivacyPolicy';
 import CookieBanner from './components/CookieBanner/CookieBanner';
+const RequireAuth = ({ user, children }) => {
+  const location = useLocation();
+
+  if (!user) {
+    return (
+      <Navigate
+        to="/login"
+        state={{ from: location.pathname, message: 'Войдите в аккаунт, чтобы продолжить' }}
+        replace
+      />
+    );
+  }
+  return children;
+};
 
 function App() {
   const [cart, setCart] = useState(() => {
@@ -46,25 +60,36 @@ function App() {
         <Route path="/" element={<Home cart={cart} setCart={setCart} />} />
         <Route path="/catalog" element={<Catalog cart={cart} setCart={setCart} />} />
         <Route path="/sales" element={<Sales cart={cart} setCart={setCart} />} />
-        <Route path="/cart" element={<Cart cart={cart} setCart={setCart} />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/product/:id" element={<ProductPage cart={cart} setCart={setCart} />} />
 
+        <Route
+          path="/cart"
+          element={
+            <RequireAuth user={user}>
+              <Cart cart={cart} setCart={setCart} />
+            </RequireAuth>
+          }
+        />
         <Route
           path="/profile"
           element={
-            <ProfilePage
-              user={user}
-              onLogout={handleLogout}
-              onUpdateUser={setUser}
-            />
+            <RequireAuth user={user}>
+              <ProfilePage
+                user={user}
+                onLogout={handleLogout}
+                onUpdateUser={setUser}
+              />
+            </RequireAuth>
           }
         />
 
-        <Route path="/product/:id" element={<ProductPage cart={cart} setCart={setCart} />} />
-
-        <Route path="/admin" element={<Admin />} />
+        <Route
+          path="/admin"
+          element={<Admin user={user} key={user?.email || 'guest'} />}
+        />
       </Routes>
 
       <CookieBanner />

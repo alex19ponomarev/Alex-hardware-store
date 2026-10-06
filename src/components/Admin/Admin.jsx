@@ -93,7 +93,7 @@ const ConfirmModal = ({ title, message, confirmText, cancelText, variant = 'dang
   );
 };
 
-const Admin = () => {
+const Admin = ({ user }) => {
   const navigate = useNavigate();
   const [tab, setTab] = useState('dashboard');
   const [accessChecked, setAccessChecked] = useState(false);
@@ -106,14 +106,23 @@ const Admin = () => {
   }, []);
 
   useEffect(() => {
-    api('check', null, 'GET').then((d) => {
-      setIsAdmin(d.isAdmin === true);
-      setAccessChecked(true);
-    }).catch(() => {
+
+    if (!user || !user.email) {
       setIsAdmin(false);
       setAccessChecked(true);
-    });
-  }, []);
+      return;
+    }
+
+    api('check', null, 'GET')
+      .then((d) => {
+        setIsAdmin(d.isAdmin === true);
+        setAccessChecked(true);
+      })
+      .catch(() => {
+        setIsAdmin(false);
+        setAccessChecked(true);
+      });
+  }, [user]);
 
   if (!accessChecked) {
     return <div className="admin-loading">Проверка доступа...</div>;
@@ -295,6 +304,9 @@ const Products = ({ toast }) => {
   const [items, setItems] = useState([]);
   const [editing, setEditing] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [sortBy, setSortBy] = useState('id-desc');
   const { confirm, ConfirmNode } = useConfirm();
 
   const load = () => {
@@ -327,45 +339,125 @@ const Products = ({ toast }) => {
 
   const upd = (k, v) => setEditing((p) => ({ ...p, [k]: v }));
 
+  const categories = Array.from(
+    new Set(items.map((p) => p.category).filter(Boolean))
+  ).sort((a, b) => a.localeCompare(b, 'ru'));
+
+  const filtered = items
+    .filter((p) => {
+      const matchesSearch = !search ||
+        p.name.toLowerCase().includes(search.toLowerCase());
+      const matchesCategory = !categoryFilter || p.category === categoryFilter;
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'name-asc':  return a.name.localeCompare(b.name, 'ru');
+        case 'name-desc': return b.name.localeCompare(a.name, 'ru');
+        case 'price-asc': return Number(a.price) - Number(b.price);
+        case 'price-desc': return Number(b.price) - Number(a.price);
+        case 'id-asc':    return Number(a.id) - Number(b.id);
+        case 'id-desc':
+        default:          return Number(b.id) - Number(a.id);
+      }
+    });
+
+  const resetFilters = () => {
+    setSearch('');
+    setCategoryFilter('');
+    setSortBy('id-desc');
+  };
+
+  const isFiltered = search || categoryFilter || sortBy !== 'id-desc';
+
   return (
     <div>
       <div className="admin-toolbar">
-        <h2>Товары ({items.length})</h2>
+        <h2>
+          Товары ({filtered.length}
+          {isFiltered && ` из ${items.length}`})
+        </h2>
         <button className="admin-btn admin-btn--primary" onClick={() => setEditing({ ...emptyProduct })}>
           + Добавить товар
         </button>
       </div>
 
+      <div className="admin-filters">
+        <input
+          type="text"
+          placeholder="🔍 Поиск по названию..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="admin-filter-search"
+        />
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="admin-filter-select"
+        >
+          <option value="">Все категории</option>
+          {categories.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          className="admin-filter-select"
+        >
+          <option value="id-desc">Сначала новые</option>
+          <option value="id-asc">Сначала старые</option>
+          <option value="name-asc">Название (А–Я)</option>
+          <option value="name-desc">Название (Я–А)</option>
+          <option value="price-asc">Цена ↑</option>
+          <option value="price-desc">Цена ↓</option>
+        </select>
+        {isFiltered && (
+          <button
+            className="admin-btn admin-btn--secondary admin-filter-reset"
+            onClick={resetFilters}
+          >
+            ✕ Сбросить
+          </button>
+        )}
+      </div>
+
       {loading ? <div className="admin-loading">Загрузка...</div> : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>ID</th><th>Фото</th><th>Название</th>
-              <th>Цена</th><th>Категория</th><th>Оценка</th><th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((p) => (
-              <tr key={p.id}>
-                <td>{p.id}</td>
-                <td>
-                  {p.image ? (
-                    <img src={`/assets/images/${p.image}`} alt="" className="admin-thumb"
-                         onError={(e) => { e.target.style.visibility='hidden'; }} />
-                  ) : '—'}
-                </td>
-                <td>{p.name}</td>
-                <td>{Number(p.price).toLocaleString('ru-RU')} ₽</td>
-                <td>{p.category}</td>
-                <td>{p.rating}</td>
-                <td className="admin-row-actions">
-                  <button className="admin-btn admin-btn--small" onClick={() => setEditing(p)}>✏️</button>
-                  <button className="admin-btn admin-btn--danger admin-btn--small" onClick={() => remove(p.id, p.name)}>🗑️</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <>
+          {filtered.length === 0 ? (
+            <div className="admin-empty">Ничего не найдено</div>
+          ) : (
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th><th>Фото</th><th>Название</th>
+                  <th>Цена</th><th>Категория</th><th>Оценка</th><th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((p) => (
+                  <tr key={p.id}>
+                    <td>{p.id}</td>
+                    <td>
+                      {p.image ? (
+                        <img src={`/assets/images/${p.image}`} alt="" className="admin-thumb"
+                             onError={(e) => { e.target.style.visibility='hidden'; }} />
+                      ) : '—'}
+                    </td>
+                    <td>{p.name}</td>
+                    <td>{Number(p.price).toLocaleString('ru-RU')} ₽</td>
+                    <td>{p.category}</td>
+                    <td>{p.rating}</td>
+                    <td className="admin-row-actions">
+                      <button className="admin-btn admin-btn--small" onClick={() => setEditing(p)}>✏️</button>
+                      <button className="admin-btn admin-btn--danger admin-btn--small" onClick={() => remove(p.id, p.name)}>🗑️</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </>
       )}
 
       {editing && (
@@ -413,6 +505,7 @@ const Products = ({ toast }) => {
 const Orders = ({ toast }) => {
   const [items, setItems] = useState([]);
   const [expanded, setExpanded] = useState(null);
+  const [search, setSearch] = useState('');
   const { confirm, ConfirmNode } = useConfirm();
 
   const load = () => api('orders.list', null, 'GET').then((d) => { if (d.success) setItems(d.data); });
@@ -431,55 +524,82 @@ const Orders = ({ toast }) => {
     if (d.success) { toast('✅ ' + d.message); load(); }
   };
 
+  const filtered = items.filter((o) => {
+    if (!search) return true;
+    const s = search.toLowerCase();
+    return (
+      String(o.id).includes(s) ||
+      o.city.toLowerCase().includes(s) ||
+      o.address.toLowerCase().includes(s)
+    );
+  });
+
   return (
     <div>
       <div className="admin-toolbar">
-        <h2>Заказы ({items.length})</h2>
+        <h2>Заказы ({filtered.length}{search && ` из ${items.length}`})</h2>
       </div>
 
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>№</th><th>Дата</th><th>Город</th><th>Адрес</th>
-            <th>Товаров</th><th>Сумма</th><th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((o) => (
-            <React.Fragment key={o.id}>
-              <tr className="admin-order-row" onClick={() => setExpanded(expanded === o.id ? null : o.id)}>
-                <td>#{o.id}</td>
-                <td>{new Date(o.created_at).toLocaleString('ru-RU')}</td>
-                <td>{o.city}</td>
-                <td>{o.address}</td>
-                <td>{o.items_count}</td>
-                <td><b>{Number(o.total).toLocaleString('ru-RU')} ₽</b></td>
-                <td className="admin-row-actions">
-                  <button className="admin-btn admin-btn--danger admin-btn--small"
-                          onClick={(e) => { e.stopPropagation(); remove(o.id); }}>🗑️</button>
-                </td>
-              </tr>
-              {expanded === o.id && (
-                <tr className="admin-order-details">
-                  <td colSpan="7">
-                    <h4>Состав заказа</h4>
-                    <ul>
-                      {o.items.map((it, i) => (
-                        <li key={i}>
-                          {it.name} — {it.quantity} × {Number(it.price).toLocaleString('ru-RU')} ₽
-                          = <b>{(it.quantity * it.price).toLocaleString('ru-RU')} ₽</b>
-                        </li>
-                      ))}
-                    </ul>
+      <div className="admin-filters">
+        <input
+          type="text"
+          placeholder="🔍 Поиск по №, городу, адресу..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="admin-filter-search"
+        />
+        {search && (
+          <button className="admin-btn admin-btn--secondary admin-filter-reset" onClick={() => setSearch('')}>
+            ✕ Сбросить
+          </button>
+        )}
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="admin-empty">{search ? 'Ничего не найдено' : 'Заказов пока нет'}</div>
+      ) : (
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>№</th><th>Дата</th><th>Город</th><th>Адрес</th>
+              <th>Товаров</th><th>Сумма</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((o) => (
+              <React.Fragment key={o.id}>
+                <tr className="admin-order-row" onClick={() => setExpanded(expanded === o.id ? null : o.id)}>
+                  <td>#{o.id}</td>
+                  <td>{new Date(o.created_at).toLocaleString('ru-RU')}</td>
+                  <td>{o.city}</td>
+                  <td>{o.address}</td>
+                  <td>{o.items_count}</td>
+                  <td><b>{Number(o.total).toLocaleString('ru-RU')} ₽</b></td>
+                  <td className="admin-row-actions">
+                    <button className="admin-btn admin-btn--danger admin-btn--small"
+                            onClick={(e) => { e.stopPropagation(); remove(o.id); }}>🗑️</button>
                   </td>
                 </tr>
-              )}
-            </React.Fragment>
-          ))}
-        </tbody>
-      </table>
-
-      {items.length === 0 && <div className="admin-empty">Заказов пока нет</div>}
+                {expanded === o.id && (
+                  <tr className="admin-order-details">
+                    <td colSpan="7">
+                      <h4>Состав заказа</h4>
+                      <ul>
+                        {o.items.map((it, i) => (
+                          <li key={i}>
+                            {it.name} — {it.quantity} × {Number(it.price).toLocaleString('ru-RU')} ₽
+                            = <b>{(it.quantity * it.price).toLocaleString('ru-RU')} ₽</b>
+                          </li>
+                        ))}
+                      </ul>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      )}
       {ConfirmNode}
     </div>
   );
@@ -487,6 +607,8 @@ const Orders = ({ toast }) => {
 
 const Users = ({ toast }) => {
   const [items, setItems] = useState([]);
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
   const { confirm, ConfirmNode } = useConfirm();
 
   const load = () => api('users.list', null, 'GET').then((d) => { if (d.success) setItems(d.data); });
@@ -510,32 +632,77 @@ const Users = ({ toast }) => {
     if (d.success) { toast('✅ ' + d.message); load(); }
   };
 
+  const filtered = items.filter((u) => {
+    const s = search.toLowerCase();
+    const matchesSearch = !search ||
+      u.email.toLowerCase().includes(s) ||
+      (u.name || '').toLowerCase().includes(s);
+    const matchesRole = !roleFilter || u.role === roleFilter;
+    return matchesSearch && matchesRole;
+  });
+
+  const isFiltered = search || roleFilter;
+
   return (
     <div>
-      <div className="admin-toolbar"><h2>Пользователи ({items.length})</h2></div>
-      <table className="admin-table">
-        <thead>
-          <tr><th>ID</th><th>Имя</th><th>Email</th><th>Роль</th><th></th></tr>
-        </thead>
-        <tbody>
-          {items.map((u) => (
-            <tr key={u.id}>
-              <td>{u.id}</td>
-              <td>{u.name}</td>
-              <td>{u.email}</td>
-              <td>
-                <select value={u.role} onChange={(e) => changeRole(u, e.target.value)}>
-                  <option value="user">user</option>
-                  <option value="admin">admin</option>
-                </select>
-              </td>
-              <td className="admin-row-actions">
-                <button className="admin-btn admin-btn--danger admin-btn--small" onClick={() => remove(u)}>🗑️</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="admin-toolbar">
+        <h2>Пользователи ({filtered.length}{isFiltered && ` из ${items.length}`})</h2>
+      </div>
+
+      <div className="admin-filters">
+        <input
+          type="text"
+          placeholder="🔍 Поиск по email или имени..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="admin-filter-search"
+        />
+        <select
+          value={roleFilter}
+          onChange={(e) => setRoleFilter(e.target.value)}
+          className="admin-filter-select"
+        >
+          <option value="">Все роли</option>
+          <option value="user">Только user</option>
+          <option value="admin">Только admin</option>
+        </select>
+        {isFiltered && (
+          <button
+            className="admin-btn admin-btn--secondary admin-filter-reset"
+            onClick={() => { setSearch(''); setRoleFilter(''); }}
+          >
+            ✕ Сбросить
+          </button>
+        )}
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="admin-empty">Ничего не найдено</div>
+      ) : (
+        <table className="admin-table">
+          <thead>
+            <tr><th>ID</th><th>Имя</th><th>Email</th><th>Роль</th><th></th></tr>
+          </thead>
+          <tbody>
+            {filtered.map((u) => (
+              <tr key={u.id}>
+                <td>{u.id}</td>
+                <td>{u.name}</td>
+                <td>{u.email}</td>
+                <td>
+                  <select value={u.role} onChange={(e) => changeRole(u, e.target.value)}>
+                    <option value="user">user</option>
+                    <option value="admin">admin</option>
+                  </select>
+                </td>
+                <td className="admin-row-actions">
+                  <button className="admin-btn admin-btn--danger admin-btn--small" onClick={() => remove(u)}>🗑️</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
       {ConfirmNode}
     </div>
   );
@@ -545,7 +712,8 @@ const Banned = ({ toast }) => {
   const [items, setItems] = useState([]);
   const [word, setWord] = useState('');
   const [search, setSearch] = useState('');
-  const { confirm, ConfirmNode } = useConfirm();
+  const [revealed, setRevealed] = useState({});
+  const { ConfirmNode } = useConfirm();
 
   const load = () => api('banned.list', null, 'GET').then((d) => { if (d.success) setItems(d.data); });
   useEffect(() => { load(); }, []);
@@ -563,12 +731,25 @@ const Banned = ({ toast }) => {
     if (d.success) { toast('✅ ' + d.message); load(); }
   };
 
-  const filtered = items.filter((i) => i.word.toLowerCase().includes(search.toLowerCase()));
+  const maskWord = (w) => {
+    if (!w) return '';
+    if (w.length <= 2) return w[0] + '*';
+    return w[0] + '*'.repeat(w.length - 1);
+  };
+
+  const toggleReveal = (id) => {
+    setRevealed((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const filtered = items.filter((i) =>
+    i.word.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div>
       <div className="admin-toolbar">
         <h2>Стоп-слова ({items.length})</h2>
+        <span className="banned-hint">Клик по слову — показать / скрыть</span>
       </div>
 
       <form className="admin-inline-form" onSubmit={add}>
@@ -580,8 +761,20 @@ const Banned = ({ toast }) => {
       <div className="banned-grid">
         {filtered.map((b) => (
           <div key={b.id} className="banned-chip">
-            <span>{b.word}</span>
-            <button onClick={() => remove(b.id)} title="Удалить">×</button>
+            <span
+              className="banned-word"
+              onClick={() => toggleReveal(b.id)}
+              title={revealed[b.id] ? 'Скрыть' : 'Показать'}
+            >
+              {revealed[b.id] ? b.word : maskWord(b.word)}
+            </span>
+            <button
+              onClick={() => remove(b.id)}
+              title="Удалить"
+              className="banned-chip-remove"
+            >
+              ×
+            </button>
           </div>
         ))}
       </div>
@@ -641,6 +834,7 @@ const Cities = ({ toast }) => {
     </div>
   );
 };
+
 const emptySale = {
   id: 0, name: '', price: '', oldPrice: '', discount: '',
   category: '', rating: 5, reviews: 0, image: '', saleEnds: '',
@@ -686,12 +880,14 @@ const Sales = ({ toast }) => {
 
       <table className="admin-table">
         <thead>
-          <tr><th>ID</th><th>Фото</th><th>Название</th><th>Цена</th><th>Скидка</th><th>До</th><th></th></tr>
+          <tr>
+            <th>Фото</th><th>Название</th><th>Цена</th>
+            <th>Скидка</th><th>До</th><th></th>
+          </tr>
         </thead>
         <tbody>
           {items.map((s) => (
             <tr key={s.id}>
-              <td>{s.id}</td>
               <td>{s.image && <img src={`/assets/images/${s.image}`} alt="" className="admin-thumb" />}</td>
               <td>{s.name}</td>
               <td>{Number(s.price).toLocaleString('ru-RU')} ₽</td>

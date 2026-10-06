@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Cart.css';
 import Footer from '../Footer/Footer';
+import MapView from '../Map/MapView';
 
 const Cart = ({ cart, setCart }) => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const Cart = ({ cart, setCart }) => {
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [isCheckingAddress, setIsCheckingAddress] = useState(false);
+  const [mapPosition, setMapPosition] = useState(null);
 
   const timeoutRef = useRef(null);
 
@@ -123,7 +125,6 @@ const Cart = ({ cart, setCart }) => {
     }
   };
 
-
   const checkAddressCensorship = async (address) => {
     try {
       const res = await fetch('/check_censorship.php', {
@@ -134,7 +135,6 @@ const Cart = ({ cart, setCart }) => {
       const data = await res.json();
       return data.ok === true;
     } catch {
-    
       return true;
     }
   };
@@ -154,7 +154,6 @@ const Cart = ({ cart, setCart }) => {
       return;
     }
 
- 
     setIsCheckingAddress(true);
     const ok = await checkAddressCensorship(deliveryAddress);
     setIsCheckingAddress(false);
@@ -163,7 +162,6 @@ const Cart = ({ cart, setCart }) => {
       showNotification('❌ Адрес содержит недопустимые слова. Измените адрес.', 5000);
       return;
     }
-
 
     const orderData = {
       items: cart,
@@ -186,10 +184,10 @@ const Cart = ({ cart, setCart }) => {
         saveOrderToHistory(orderData);
         setCart([]);
         setDeliveryAddress('');
+        setMapPosition(null);
         setIsCityModalOpen(false);
         setIsAddressModalOpen(false);
       } else {
-      
         showNotification(`❌ ${data.message || 'Ошибка при отправке заказа'}`, 5000);
       }
     } catch {
@@ -375,7 +373,7 @@ const Cart = ({ cart, setCart }) => {
 
         {isAddressModalOpen && (
           <div className="modal-overlay" onClick={() => setIsAddressModalOpen(false)}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-content modal-content--address" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
                 <h2>Введите адрес доставки</h2>
                 <button
@@ -383,6 +381,7 @@ const Cart = ({ cart, setCart }) => {
                   onClick={() => {
                     setIsAddressModalOpen(false);
                     setDeliveryAddress('');
+                    setMapPosition(null);
                   }}
                 >
                   &times;
@@ -393,8 +392,15 @@ const Cart = ({ cart, setCart }) => {
                   placeholder="Ваш адрес..."
                   value={deliveryAddress}
                   onChange={(e) => setDeliveryAddress(e.target.value)}
-                  rows={4}
+                  rows={3}
                   style={{ width: '100%' }}
+                />
+                <p className="map-hint">📍 Или укажите точку на карте:</p>
+                <MapView
+                  position={mapPosition}
+                  setPosition={setMapPosition}
+                  onAddressChange={(address) => setDeliveryAddress(address)}
+                  height="250px"
                 />
               </div>
               <div className="modal-footer">
@@ -403,6 +409,7 @@ const Cart = ({ cart, setCart }) => {
                   onClick={() => {
                     setIsAddressModalOpen(false);
                     setDeliveryAddress('');
+                    setMapPosition(null);
                   }}
                 >
                   Отмена

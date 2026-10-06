@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import './Home.css';
 import Footer from '../Footer/Footer';
@@ -9,7 +9,21 @@ const Home = ({ cart, setCart }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [message, setMessage] = useState('');
+  const timeoutRef = useRef(null);
   const { toggleFavorite, isFavorite } = useFavorites();
+
+  const addMessage = (msg) => {
+    setMessage(msg);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => setMessage(''), 3000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   const addToCart = (product) => {
     if (!setCart) return;
@@ -25,6 +39,8 @@ const Home = ({ cart, setCart }) => {
       }
       return [...prevCart, { ...product, quantity: 1 }];
     });
+
+    addMessage(`✅ ${product.name} добавлен в корзину`);
   };
 
   useEffect(() => {
@@ -50,6 +66,8 @@ const Home = ({ cart, setCart }) => {
   return (
     <div>
       <main className="home">
+        {message && <div className="notification">{message}</div>}
+
         <section className="hero">
           <div className="hero-content">
             <h1>TechStore — техника для жизни</h1>

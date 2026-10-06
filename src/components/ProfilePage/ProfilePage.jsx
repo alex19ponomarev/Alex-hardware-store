@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './Profile.css';
 import { useFavorites } from '../useFavorites/useFavorites';
+import MapView from '../Map/MapView';
 
 const STORAGE_KEY = 'userProfiles';
 const OLD_STORAGE_KEY = 'userProfile';
@@ -19,6 +20,7 @@ const Profile = ({ user, onLogout }) => {
   const [showFavorites, setShowFavorites] = useState(false);
   const [favProducts, setFavProducts] = useState([]);
   const [favLoading, setFavLoading] = useState(false);
+  const [mapPosition, setMapPosition] = useState(null);
 
   const { favorites, toggleFavorite, clearFavorites } = useFavorites();
 
@@ -118,7 +120,6 @@ const Profile = ({ user, onLogout }) => {
 
     }
   };
-
 
   useEffect(() => {
     if (!showFavorites || favorites.length === 0) {
@@ -236,7 +237,6 @@ const Profile = ({ user, onLogout }) => {
     setTimeout(() => setMessage(''), 3000);
   };
 
-
   if (!user) {
     return (
       <div className="profile-container">
@@ -337,6 +337,15 @@ const Profile = ({ user, onLogout }) => {
                   onChange={handleInputChange}
                   placeholder="Город, улица, дом, квартира"
                 ></textarea>
+                <p className="map-hint">📍 Или укажите точку на карте:</p>
+                <MapView
+                  position={mapPosition}
+                  setPosition={setMapPosition}
+                  onAddressChange={(address) =>
+                    setFormData((prev) => ({ ...prev, address }))
+                  }
+                  height="250px"
+                />
               </div>
               <div className="profile-actions">
                 <button type="submit" className="btn-save">Сохранить</button>
@@ -387,7 +396,6 @@ const Profile = ({ user, onLogout }) => {
           </div>
         </aside>
       </main>
-
 
       {showOrders && (
         <div className="orders-modal-overlay" onClick={() => setShowOrders(false)}>
@@ -462,7 +470,6 @@ const Profile = ({ user, onLogout }) => {
         </div>
       )}
 
-      {/* Избранное */}
       {showFavorites && (
         <div className="orders-modal-overlay" onClick={() => setShowFavorites(false)}>
           <div className="orders-modal" onClick={(e) => e.stopPropagation()}>
