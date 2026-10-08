@@ -12,6 +12,7 @@ import ProductPage from './components/ProductPage/ProductPage';
 import Admin from './components/Admin/Admin';
 import PrivacyPolicy from './components/PrivacyPolicy/PrivacyPolicy';
 import CookieBanner from './components/CookieBanner/CookieBanner';
+
 const RequireAuth = ({ user, children }) => {
   const location = useLocation();
 
@@ -65,14 +66,8 @@ function App() {
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/product/:id" element={<ProductPage cart={cart} setCart={setCart} />} />
 
-        <Route
-          path="/cart"
-          element={
-            <RequireAuth user={user}>
-              <Cart cart={cart} setCart={setCart} />
-            </RequireAuth>
-          }
-        />
+        <Route path="/cart" element={<Cart cart={cart} setCart={setCart} />} />
+
         <Route
           path="/profile"
           element={

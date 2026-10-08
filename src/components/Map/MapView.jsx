@@ -1,5 +1,6 @@
 import React from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
+import { useEffect } from 'react';
 import L from 'leaflet';
 
 const defaultIcon = L.icon({
@@ -9,6 +10,33 @@ const defaultIcon = L.icon({
   iconSize: [25, 41],
   iconAnchor: [12, 41],
 });
+
+const CITY_COORDS = {
+  'Москва': [55.7558, 37.6173],
+  'Санкт-Петербург': [59.9343, 30.3351],
+  'Новосибирск': [55.0084, 82.9357],
+  'Екатеринбург': [56.8389, 60.6057],
+  'Казань': [55.8304, 49.0661],
+  'Нижний Новгород': [56.3269, 44.0059],
+  'Ростов-на-Дону': [47.222078, 39.720349],
+};
+
+const getCityCoords = (city) => {
+  if (!city) return CITY_COORDS['Москва'];
+  return CITY_COORDS[city] || CITY_COORDS['Москва'];
+};
+
+function MapController({ center }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (center) {
+      map.setView(center, 12);
+    }
+  }, [center, map]);
+
+  return null;
+}
 
 function LocationMarker({ position, setPosition, onAddressChange }) {
   useMapEvents({
@@ -38,20 +66,24 @@ function LocationMarker({ position, setPosition, onAddressChange }) {
   );
 }
 
-const MapView = ({ position, setPosition, onAddressChange, height = '250px' }) => {
-  const defaultCenter = position || [47.222078, 39.720349];
+const MapView = ({ position, setPosition, onAddressChange, city, height = '250px' }) => {
+  const centerCoords = position || getCityCoords(city);
 
   return (
     <div className="map-wrapper" style={{ height }}>
       <MapContainer
-        center={defaultCenter}
-        zoom={13}
+        center={centerCoords}
+        zoom={12}
         style={{ height: '100%', width: '100%', borderRadius: '8px' }}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         />
+
+
+        <MapController center={centerCoords} />
+
         <LocationMarker
           position={position}
           setPosition={setPosition}

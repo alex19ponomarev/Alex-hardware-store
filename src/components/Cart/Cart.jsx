@@ -400,6 +400,7 @@ const Cart = ({ cart, setCart }) => {
                   position={mapPosition}
                   setPosition={setMapPosition}
                   onAddressChange={(address) => setDeliveryAddress(address)}
+                  city={selectedCity}
                   height="250px"
                 />
               </div>
